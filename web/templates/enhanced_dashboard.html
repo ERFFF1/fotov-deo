@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face/Video AI Studio - Dashboard</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        
+        .feature-description {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .feature-badges {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            background: #e9ecef;
+            color: #495057;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .badge.recommended {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge.new {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .feature-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn-feature {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn-primary-feature {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary-feature:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary-feature {
+            background: #f8f9fa;
+            color: #495057;
+            border: 2px solid #e9ecef;
+        }
+        
+        .btn-secondary-feature:hover {
+            background: #e9ecef;
+            border-color: #dee2e6;
+        }
+        
+        .examples-section {
+            background: #f8f9fa;
+            padding: 3rem 0;
+            margin: 3rem 0;
+        }
+        
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .example-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .example-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .example-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .example-content {
+            padding: 1.5rem;
+        }
+        
+        .example-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .example-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .example-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .example-link:hover {
+            text-decoration: underline;
+        }
+        
+        .live-jobs-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .live-jobs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .live-jobs-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .live-indicator {
+            width: 10px;
+            height: 10px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .job-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .job-item:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+        
+        .job-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .job-info {
+            flex: 1;
+        }
+        
+        .job-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+        
+        .job-meta {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .job-progress {
+            width: 100px;
+        }
+        
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .quick-action {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            color: #495057;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .quick-action:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .notification-banner {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .notification-icon {
+            font-size: 1.5rem;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        
+        .notification-message {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        
+        .notification-close:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-magic"></i>
+                Face/Video AI Studio
+            </div>
+            <nav class="nav">
+                <a href="/"><i class="fas fa-home"></i> Ana Sayfa</a>
+                <a href="/gallery"><i class="fas fa-images"></i> Galeri</a>
+                <a href="/api/docs"><i class="fas fa-code"></i> API</a>
+                <a href="/settings"><i class="fas fa-cog"></i> Ayarlar</a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">🎯 AI Destekli Yaratıcılık</h1>
+            <p class="hero-subtitle">
+                Yapay zeka ile fotoğraf ve videolarınızı dönüştürün. 
+                Yüz değiştirme, konuşan kafa, renk düzeltme ve daha fazlası!
+            </p>
+            <div class="quick-actions">
+                <a href="/new?type=face_swap" class="quick-action">
+                    <i class="fas fa-exchange-alt"></i>
+                    Hızlı Yüz Değiştirme
+                </a>
+                <a href="/new?type=talking_head" class="quick-action">
+                    <i class="fas fa-microphone"></i>
+                    Konuşan Kafa Oluştur
+                </a>
+                <a href="/gallery" class="quick-action">
+                    <i class="fas fa-images"></i>
+                    Galeriyi Keşfet
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Notification Banner -->
+        <div class="notification-banner" id="notificationBanner">
+            <div class="notification-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">🎉 Yeni Özellikler!</div>
+                <div class="notification-message">
+                    ControlNet ile kontrollü görüntü üretimi ve gelişmiş video post-prodüksiyon özellikleri eklendi!
+                </div>
+            </div>
+            <button class="notification-close" onclick="closeNotification()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="feature-cards">
+            <!-- Face Swap Card -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <h3 class="feature-title">Yüz Değiştirme</h3>
+                <p class="feature-description">
+                    Bir kişinin yüzünü başka bir görüntü veya videoya profesyonel kalitede yerleştirin. 
+                    InsightFace teknolojisi ile doğal sonuçlar.
+                </p>
+                <div class="feature-badges">
+                    <span class="badge recommended">Önerilen</span>
+                    <span class="badge">Hızlı</span>
+                    <span class="badge">Yüksek Kalite</span>
+                </div>
+                <div class="feature-actions">
+                    <a href="/new?type=face_swap" class="btn-feature btn-primary-feature">
+                        <i class="fas fa-play"></i> Hemen Dene
+                    </a>
+                    <a href="/examples/face_swap" class="btn-feature btn-secondary-feature">
+                        <i class="fas fa-eye"></i> Örnekler
+                    </a>
+                </div>
+            </div>
+
+            <!-- Talking Head Card -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-microphone"></i>
+                </div>
+                <h3 class="feature-title">Konuşan Kafa</h3>
+                <p class="feature-description">
+                    Statik bir fotoğrafı konuşan, hareket eden bir videoya dönüştürün. 
+                    Wav2Lip ve SadTalker teknolojileri ile gerçekçi sonuçlar.
+                </p>
+                <div class="feature-badges">
+                    <span class="badge new">Yeni</span>
+                    <span class="badge">AI Destekli</span>
+                    <span class="badge">Gerçekçi</span>
+                </div>
+                <div class="feature-actions">
+                    <a href="/new?type=talking_head" class="btn-feature btn-primary-feature">
+                        <i class="fas fa-play"></i> Hemen Dene
+                    </a>
+                    <a href="/examples/talking_head" class="btn-feature btn-secondary-feature">
+                        <i class="fas fa-eye"></i> Örnekler
+                    </a>
+                </div>
+            </div>
+
+            <!-- Color Grade Card -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3 class="feature-title">Renk Düzeltme</h3>
+                <p class="feature-description">
+                    Görüntü ve videolarınızın renklerini profesyonel seviyede düzeltin. 
+                    Rec709 standartları ile sinema kalitesi.
+                </p>
+                <div class="feature-badges">
+                    <span class="badge">Profesyonel</span>
+                    <span class="badge">Hızlı</span>
+                </div>
+                <div class="feature-actions">
+                    <a href="/new?type=color_grade" class="btn-feature btn-primary-feature">
+                        <i class="fas fa-play"></i> Hemen Dene
+                    </a>
+                    <a href="/examples/color_grade" class="btn-feature btn-secondary-feature">
+                        <i class="fas fa-eye"></i> Örnekler
+                    </a>
+                </div>
+            </div>
+
+            <!-- Background Replace Card -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-image"></i>
+                </div>
+                <h3 class="feature-title">Arka Plan Değiştirme</h3>
+                <p class="feature-description">
+                    Görüntülerinizin arka planını AI ile otomatik olarak değiştirin. 
+                    Chroma key ve segmentasyon teknolojileri.
+                </p>
+                <div class="feature-badges">
+                    <span class="badge">AI Destekli</span>
+                    <span class="badge">Otomatik</span>
+                </div>
+                <div class="feature-actions">
+                    <a href="/new?type=bg_replace" class="btn-feature btn-primary-feature">
+                        <i class="fas fa-play"></i> Hemen Dene
+                    </a>
+                    <a href="/examples/bg_replace" class="btn-feature btn-secondary-feature">
+                        <i class="fas fa-eye"></i> Örnekler
+                    </a>
+                </div>
+            </div>
+
+            <!-- ControlNet Card -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <h3 class="feature-title">AI Görüntü Üretimi</h3>
+                <p class="feature-description">
+                    ControlNet ile kontrollü görüntü üretimi. Metin açıklamasından 
+                    veya mevcut görüntülerden yeni sanat eserleri oluşturun.
+                </p>
+                <div class="feature-badges">
+                    <span class="badge new">Yeni</span>
+                    <span class="badge">AI Üretimi</span>
+                    <span class="badge">Kreatif</span>
+                </div>
+                <div class="feature-actions">
+                    <a href="/new?type=controlnet_generation" class="btn-feature btn-primary-feature">
+                        <i class="fas fa-play"></i> Hemen Dene
+                    </a>
+                    <a href="/examples/controlnet" class="btn-feature btn-secondary-feature">
+                        <i class="fas fa-eye"></i> Örnekler
+                    </a>
+                </div>
+            </div>
+
+            <!-- Video Post-Production Card -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <h3 class="feature-title">Video Post-Prodüksiyon</h3>
+                <p class="feature-description">
+                    Videolarınızı profesyonel seviyede işleyin. Stabilizasyon, 
+                    gürültü azaltma, keskinlik artırma ve ses iyileştirme.
+                </p>
+                <div class="feature-badges">
+                    <span class="badge new">Yeni</span>
+                    <span class="badge">Profesyonel</span>
+                    <span class="badge">Kapsamlı</span>
+                </div>
+                <div class="feature-actions">
+                    <a href="/new?type=video_post_production" class="btn-feature btn-primary-feature">
+                        <i class="fas fa-play"></i> Hemen Dene
+                    </a>
+                    <a href="/examples/video_post" class="btn-feature btn-secondary-feature">
+                        <i class="fas fa-eye"></i> Örnekler
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number" id="totalJobs">0</div>
+                <div class="stat-label">Toplam İşlem</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedJobs">0</div>
+                <div class="stat-label">Tamamlanan</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeJobs">0</div>
+                <div class="stat-label">Aktif İşlem</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Kullanıcı</div>
+            </div>
+        </div>
+
+        <!-- Live Jobs Section -->
+        <div class="live-jobs-section">
+            <div class="live-jobs-header">
+                <h2 class="live-jobs-title">
+                    <i class="fas fa-tasks"></i>
+                    Canlı İş Takibi
+                    <div class="live-indicator"></div>
+                </h2>
+                <a href="/jobs" class="btn btn-outline">Tümünü Gör</a>
+            </div>
+            <div id="liveJobsList">
+                <!-- Live jobs will be populated here -->
+            </div>
+        </div>
+
+        <!-- Examples Section -->
+        <div class="examples-section">
+            <div class="container">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">
+                    <i class="fas fa-star"></i> Öne Çıkan Örnekler
+                </h2>
+                <div class="examples-grid">
+                    <div class="example-card">
+                        <img src="/static/images/example1.jpg" alt="Yüz Değiştirme Örneği" class="example-image">
+                        <div class="example-content">
+                            <h4 class="example-title">Profesyonel Yüz Değiştirme</h4>
+                            <p class="example-description">
+                                InsightFace teknolojisi ile gerçekçi yüz değiştirme örneği. 
+                                Renk düzeltme ve doğal görünüm.
+                            </p>
+                            <a href="/examples/face_swap_demo" class="example-link">
+                                <i class="fas fa-play"></i>
+                                Bu görüntüyü nasıl yaptık?
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="example-card">
+                        <img src="/static/images/example2.jpg" alt="Konuşan Kafa Örneği" class="example-image">
+                        <div class="example-content">
+                            <h4 class="example-title">Konuşan Kafa Animasyonu</h4>
+                            <p class="example-description">
+                                Wav2Lip ile statik fotoğraftan konuşan kafa oluşturma. 
+                                Dudak senkronizasyonu ve doğal hareketler.
+                            </p>
+                            <a href="/examples/talking_head_demo" class="example-link">
+                                <i class="fas fa-play"></i>
+                                Bu görüntüyü nasıl yaptık?
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="example-card">
+                        <img src="/static/images/example3.jpg" alt="AI Üretimi Örneği" class="example-image">
+                        <div class="example-content">
+                            <h4 class="example-title">AI Görüntü Üretimi</h4>
+                            <p class="example-description">
+                                ControlNet ile metin açıklamasından görüntü üretimi. 
+                                Kreatif ve özgün sanat eserleri.
+                            </p>
+                            <a href="/examples/ai_generation_demo" class="example-link">
+                                <i class="fas fa-play"></i>
+                                Bu görüntüyü nasıl yaptık?
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        // Enhanced Dashboard JavaScript
+        class EnhancedDashboard {
+            constructor() {
+                this.ws = null;
+                this.clientId = this.generateClientId();
+                this.init();
+            }
+
+            init() {
+                this.connectWebSocket();
+                this.loadStats();
+                this.loadLiveJobs();
+                this.setupEventListeners();
+            }
+
+            generateClientId() {
+                return 'client_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            connectWebSocket() {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${window.location.host}/ws/${this.clientId}`;
+                
+                this.ws = new WebSocket(wsUrl);
+                
+                this.ws.onopen = () => {
+                    console.log('WebSocket bağlantısı kuruldu');
+                };
+                
+                this.ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    this.handleWebSocketMessage(data);
+                };
+                
+                this.ws.onclose = () => {
+                    console.log('WebSocket bağlantısı kesildi');
+                    // Yeniden bağlanmayı dene
+                    setTimeout(() => this.connectWebSocket(), 5000);
+                };
+            }
+
+            handleWebSocketMessage(data) {
+                switch(data.type) {
+                    case 'job_update':
+                        this.updateJobInList(data.job_id, data.data);
+                        break;
+                    case 'job_created':
+                        this.addJobToList(data);
+                        break;
+                    case 'system_status':
+                        this.updateSystemStats(data.data);
+                        break;
+                }
+            }
+
+            async loadStats() {
+                try {
+                    const response = await fetch('/api/stats');
+                    const stats = await response.json();
+                    this.updateStatsDisplay(stats);
+                } catch (error) {
+                    console.error('İstatistik yükleme hatası:', error);
+                }
+            }
+
+            updateStatsDisplay(stats) {
+                document.getElementById('totalJobs').textContent = stats.total_jobs || 0;
+                document.getElementById('completedJobs').textContent = stats.completed_jobs || 0;
+                document.getElementById('activeJobs').textContent = stats.active_jobs || 0;
+                document.getElementById('totalUsers').textContent = stats.total_users || 0;
+            }
+
+            async loadLiveJobs() {
+                try {
+                    const response = await fetch('/api/jobs?limit=5&status=running');
+                    const data = await response.json();
+                    this.displayLiveJobs(data.jobs);
+                } catch (error) {
+                    console.error('Canlı işler yükleme hatası:', error);
+                }
+            }
+
+            displayLiveJobs(jobs) {
+                const container = document.getElementById('liveJobsList');
+                
+                if (jobs.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: #6c757d;">
+                            <i class="fas fa-coffee" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>Şu anda aktif iş yok. Yeni bir proje başlatın!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = jobs.map(job => `
+                    <div class="job-item" data-job-id="${job.id}">
+                        <div class="job-avatar">
+                            ${this.getJobIcon(job.job_type)}
+                        </div>
+                        <div class="job-info">
+                            <div class="job-title">${this.getJobTitle(job.job_type)}</div>
+                            <div class="job-meta">
+                                ${this.formatTime(job.created_at)} • 
+                                ${job.current_step || 'Başlatılıyor...'}
+                            </div>
+                        </div>
+                        <div class="job-progress">
+                            <div class="progress">
+                                <div class="progress-bar" style="width: ${job.progress}%"></div>
+                            </div>
+                            <small style="color: #6c757d;">${job.progress.toFixed(1)}%</small>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            getJobIcon(jobType) {
+                const icons = {
+                    'face_swap': '🔄',
+                    'talking_head': '🗣️',
+                    'color_grade': '🎨',
+                    'bg_replace': '🖼️',
+                    'controlnet_generation': '✨',
+                    'video_post_production': '🎬'
+                };
+                return icons[jobType] || '⚙️';
+            }
+
+            getJobTitle(jobType) {
+                const titles = {
+                    'face_swap': 'Yüz Değiştirme',
+                    'talking_head': 'Konuşan Kafa',
+                    'color_grade': 'Renk Düzeltme',
+                    'bg_replace': 'Arka Plan Değiştirme',
+                    'controlnet_generation': 'AI Görüntü Üretimi',
+                    'video_post_production': 'Video Post-Prodüksiyon'
+                };
+                return titles[jobType] || jobType;
+            }
+
+            formatTime(timestamp) {
+                const date = new Date(timestamp);
+                const now = new Date();
+                const diff = now - date;
+                const minutes = Math.floor(diff / 60000);
+                
+                if (minutes < 1) return 'Az önce';
+                if (minutes < 60) return `${minutes} dk önce`;
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return `${hours} saat önce`;
+                return date.toLocaleDateString('tr-TR');
+            }
+
+            updateJobInList(jobId, jobData) {
+                const jobElement = document.querySelector(`[data-job-id="${jobId}"]`);
+                if (jobElement) {
+                    const progressBar = jobElement.querySelector('.progress-bar');
+                    const progressText = jobElement.querySelector('small');
+                    
+                    if (progressBar) {
+                        progressBar.style.width = `${jobData.progress}%`;
+                    }
+                    if (progressText) {
+                        progressText.textContent = `${jobData.progress.toFixed(1)}%`;
+                    }
+                    
+                    // İş tamamlandıysa listeden kaldır
+                    if (['completed', 'failed', 'cancelled'].includes(jobData.status)) {
+                        setTimeout(() => {
+                            jobElement.remove();
+                            this.loadLiveJobs(); // Listeyi yenile
+                        }, 3000);
+                    }
+                }
+            }
+
+            addJobToList(jobData) {
+                // Yeni iş eklendiğinde listeyi yenile
+                this.loadLiveJobs();
+            }
+
+            setupEventListeners() {
+                // Bildirim kapatma
+                window.closeNotification = () => {
+                    document.getElementById('notificationBanner').style.display = 'none';
+                };
+
+                // Periyodik güncellemeler
+                setInterval(() => {
+                    this.loadStats();
+                    this.loadLiveJobs();
+                }, 30000); // 30 saniyede bir
+            }
+        }
+
+        // Dashboard'u başlat
+        document.addEventListener('DOMContentLoaded', () => {
+            new EnhancedDashboard();
+        });
+    </script>
+</body>
+</html>

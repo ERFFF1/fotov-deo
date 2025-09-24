@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face/Video AI Studio - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: #2c3e50; color: white; padding: 1rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .card { background: white; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn { background: #3498db; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn:hover { background: #2980b9; }
+        .btn-success { background: #27ae60; }
+        .btn-warning { background: #f39c12; }
+        .btn-danger { background: #e74c3c; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+        .status { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+        .status.completed { background: #d4edda; color: #155724; }
+        .status.running { background: #fff3cd; color: #856404; }
+        .status.failed { background: #f8d7da; color: #721c24; }
+        .status.pending { background: #e2e3e5; color: #383d41; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>🎯 Face/Video AI Studio</h1>
+            <p>Yapay zeka destekli fotoğraf ve video işleme platformu</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Hızlı Başlat Kartları -->
+        <div class="card">
+            <h2>🚀 Hızlı Başlat</h2>
+            <div class="grid">
+                <a href="/new?type=face_swap" class="btn">🔄 Yüz Değiştirme</a>
+                <a href="/new?type=talking_head" class="btn">🗣️ Konuşan Kafa</a>
+                <a href="/new?type=color_grade" class="btn">🎨 Renk Düzeltme</a>
+                <a href="/new?type=bg_replace" class="btn">🖼️ Arka Plan Değiştirme</a>
+            </div>
+        </div>
+
+        <!-- Son İşler -->
+        <div class="card">
+            <h2>📋 Son İşler</h2>
+            {% if recent_jobs %}
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f8f9fa;">
+                                <th style="padding: 0.75rem; text-align: left; border-bottom: 1px solid #dee2e6;">ID</th>
+                                <th style="padding: 0.75rem; text-align: left; border-bottom: 1px solid #dee2e6;">Tür</th>
+                                <th style="padding: 0.75rem; text-align: left; border-bottom: 1px solid #dee2e6;">Durum</th>
+                                <th style="padding: 0.75rem; text-align: left; border-bottom: 1px solid #dee2e6;">İlerleme</th>
+                                <th style="padding: 0.75rem; text-align: left; border-bottom: 1px solid #dee2e6;">Oluşturulma</th>
+                                <th style="padding: 0.75rem; text-align: left; border-bottom: 1px solid #dee2e6;">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in recent_jobs %}
+                            <tr>
+                                <td style="padding: 0.75rem; border-bottom: 1px solid #dee2e6;">#{{ job.id }}</td>
+                                <td style="padding: 0.75rem; border-bottom: 1px solid #dee2e6;">{{ job.job_type }}</td>
+                                <td style="padding: 0.75rem; border-bottom: 1px solid #dee2e6;">
+                                    <span class="status {{ job.status }}">{{ job.status }}</span>
+                                </td>
+                                <td style="padding: 0.75rem; border-bottom: 1px solid #dee2e6;">
+                                    <div style="background: #e9ecef; border-radius: 4px; height: 8px; width: 100px;">
+                                        <div style="background: #007bff; height: 100%; width: {{ job.progress }}%; border-radius: 4px;"></div>
+                                    </div>
+                                    {{ "%.1f"|format(job.progress) }}%
+                                </td>
+                                <td style="padding: 0.75rem; border-bottom: 1px solid #dee2e6;">{{ job.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                                <td style="padding: 0.75rem; border-bottom: 1px solid #dee2e6;">
+                                    <a href="/job/{{ job.id }}" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Detay</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>Henüz iş yok. Yeni bir proje oluşturun!</p>
+            {% endif %}
+        </div>
+
+        <!-- Preset'ler -->
+        <div class="card">
+            <h2>⚙️ Hazır Ayarlar</h2>
+            {% if presets %}
+                <div class="grid">
+                    {% for preset in presets %}
+                    <div style="border: 1px solid #dee2e6; border-radius: 4px; padding: 1rem;">
+                        <h4>{{ preset }}</h4>
+                        <p style="color: #6c757d; font-size: 0.9rem;">Hazır konfigürasyon</p>
+                        <a href="/new?preset={{ preset }}" class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Kullan</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>Henüz preset yok.</p>
+            {% endif %}
+        </div>
+
+        <!-- Navigasyon -->
+        <div class="card">
+            <h2>🧭 Navigasyon</h2>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="/new" class="btn btn-success">➕ Yeni Proje</a>
+                <a href="/gallery" class="btn">🖼️ Galeri</a>
+                <a href="/api/docs" class="btn">📚 API Dokümantasyonu</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sayfa yüklendiğinde son işleri güncelle
+        function updateJobs() {
+            fetch('/api/jobs?limit=10')
+                .then(response => response.json())
+                .then(data => {
+                    // İşleri güncelle (basit implementasyon)
+                    console.log('İşler güncellendi:', data);
+                })
+                .catch(error => console.error('Hata:', error));
+        }
+
+        // Her 5 saniyede bir güncelle
+        setInterval(updateJobs, 5000);
+    </script>
+</body>
+</html>

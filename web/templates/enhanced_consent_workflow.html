@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Studio - Gelişmiş Rıza Onayı</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        
+        .consent-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            padding: 3rem;
+            max-width: 800px;
+            text-align: center;
+        }
+        
+        .consent-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .consent-description {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            color: var(--text-color-secondary);
+        }
+        
+        .consent-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .consent-option {
+            display: flex;
+            align-items: center;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .consent-option:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.1);
+        }
+        
+        .consent-option.selected {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.2);
+            background-color: rgba(var(--accent-rgb), 0.05);
+        }
+        
+        .consent-option input[type="radio"] {
+            margin-right: 1rem;
+            accent-color: var(--accent-color);
+        }
+        
+        .consent-option label {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .consent-option p {
+            font-size: 0.9rem;
+            color: var(--text-color-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        .consent-document-section,
+        .evidence-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: var(--input-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+        
+        .consent-document-section h3,
+        .evidence-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .document-upload-zone,
+        .evidence-upload-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-color);
+        }
+        
+        .document-upload-zone:hover,
+        .evidence-upload-zone:hover {
+            border-color: var(--primary-color);
+            background: rgba(var(--primary-rgb), 0.05);
+        }
+        
+        .document-upload-zone.dragover,
+        .evidence-upload-zone.dragover {
+            border-color: var(--accent-color);
+            background: rgba(var(--accent-rgb), 0.1);
+        }
+        
+        .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-color-secondary);
+        }
+        
+        .upload-text {
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-hint {
+            font-size: 0.9rem;
+            color: var(--text-color-secondary);
+        }
+        
+        .document-preview,
+        .evidence-preview {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--success-bg);
+            border-radius: 8px;
+            border: 1px solid var(--success-border);
+        }
+        
+        .document-preview.show,
+        .evidence-preview.show {
+            display: block;
+        }
+        
+        .document-info,
+        .evidence-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .document-name,
+        .evidence-name {
+            font-weight: 500;
+            color: var(--success-color);
+        }
+        
+        .document-size,
+        .evidence-size {
+            color: var(--text-color-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .evidence-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .remove-document,
+        .remove-evidence {
+            background: var(--error-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .remove-document:hover,
+        .remove-evidence:hover {
+            background: var(--error-color-dark);
+        }
+        
+        .consent-warning {
+            background-color: var(--warning-bg);
+            color: var(--warning-color);
+            border-left: 5px solid var(--warning-border);
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        
+        .consent-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--secondary-color-dark);
+        }
+        
+        .consent-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+        }
+        
+        .consent-button:disabled {
+            background: var(--disabled-bg);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .consent-button:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .progress-step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--border-color);
+            color: var(--text-color-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .progress-step.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .progress-step.completed {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .progress-line {
+            width: 50px;
+            height: 2px;
+            background: var(--border-color);
+            margin: 0 0.5rem;
+            align-self: center;
+        }
+        
+        .progress-line.completed {
+            background: var(--success-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="consent-container">
+        <h1 class="consent-title"><i class="fas fa-shield-alt"></i> Gelişmiş Rıza Onayı</h1>
+        <p class="consent-description">
+            Yapay zeka işlemlerine başlamadan önce, işlenecek içerik için uygun rıza türünü seçmeniz ve gerekli belgeleri yüklemeniz gerekmektedir.
+            Bu, yasal ve etik standartlara uymak için önemlidir.
+        </p>
+
+        <!-- Progress Indicator -->
+        <div class="progress-indicator">
+            <div class="progress-step active" data-step="1">1</div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="2">2</div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="3">3</div>
+        </div>
+
+        <form id="consentForm">
+            <!-- Step 1: Consent Type Selection -->
+            <div class="consent-step" id="consentStep1">
+                <h2>Rıza Türü Seçimi</h2>
+                <div class="consent-options" id="consentOptions">
+                    <!-- Consent options will be loaded here by JS -->
+                </div>
+            </div>
+            
+            <!-- Step 2: Document Upload -->
+            <div class="consent-step" id="consentStep2" style="display: none;">
+                <h2>Belge Yükleme</h2>
+                
+                <!-- Rıza Belgesi Yükleme -->
+                <div class="consent-document-section" id="consentDocumentSection">
+                    <h3>📄 Rıza Belgesi Yükleme</h3>
+                    <p>Yasal uyumluluk için rıza belgenizi yükleyin:</p>
+                    
+                    <div class="document-upload-zone" id="documentUploadZone">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">Rıza belgesini sürükleyip bırakın veya tıklayarak seçin</div>
+                        <div class="upload-hint">Desteklenen formatlar: PDF, JPG, PNG, DOC, DOCX</div>
+                        <input type="file" id="documentInput" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display: none;">
+                    </div>
+                    
+                    <div class="document-preview" id="documentPreview">
+                        <div class="document-info">
+                            <span class="document-name" id="documentName"></span>
+                            <span class="document-size" id="documentSize"></span>
+                        </div>
+                        <button type="button" class="remove-document" id="removeDocument">Kaldır</button>
+                    </div>
+                </div>
+                
+                <!-- Kanıt Dosyası Yükleme -->
+                <div class="evidence-section" id="evidenceSection">
+                    <h3>🔍 Kanıt Dosyası</h3>
+                    <p>İşlenecek içeriğe ait kanıt dosyası yükleyin:</p>
+                    
+                    <div class="evidence-upload-zone" id="evidenceUploadZone">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">Kanıt dosyasını sürükleyip bırakın veya tıklayarak seçin</div>
+                        <div class="upload-hint">Desteklenen formatlar: JPG, PNG, MP4, MOV</div>
+                        <input type="file" id="evidenceInput" accept="image/*,video/*" style="display: none;">
+                    </div>
+                    
+                    <div class="evidence-preview" id="evidencePreview">
+                        <img class="evidence-image" id="evidenceImage" src="" alt="Kanıt Önizleme">
+                        <div class="evidence-info">
+                            <span class="evidence-name" id="evidenceName"></span>
+                            <span class="evidence-size" id="evidenceSize"></span>
+                        </div>
+                        <button type="button" class="remove-evidence" id="removeEvidence">Kaldır</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: Confirmation -->
+            <div class="consent-step" id="consentStep3" style="display: none;">
+                <h2>Onay ve Başlatma</h2>
+                <div class="consent-warning" id="consentWarning">
+                    <!-- Warning message will be displayed here -->
+                </div>
+            </div>
+            
+            <div class="consent-actions">
+                <button type="button" class="btn btn-secondary" id="backButton" style="display: none;">Geri</button>
+                <button type="button" class="btn btn-secondary" id="nextButton" style="display: none;">İleri</button>
+                <button type="submit" class="consent-button" id="startButton" disabled>İşleme Başla</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedConsent = null;
+        let uploadedDocument = null;
+        let uploadedEvidence = null;
+        
+        // Step navigation
+        document.getElementById('nextButton').addEventListener('click', nextStep);
+        document.getElementById('backButton').addEventListener('click', prevStep);
+        
+        function nextStep() {
+            if (currentStep < 3) {
+                currentStep++;
+                updateStepDisplay();
+            }
+        }
+        
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepDisplay();
+            }
+        }
+        
+        function updateStepDisplay() {
+            // Update progress indicator
+            document.querySelectorAll('.progress-step').forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                } else if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                }
+            });
+            
+            // Update progress lines
+            document.querySelectorAll('.progress-line').forEach((line, index) => {
+                line.classList.remove('completed');
+                if (index + 1 < currentStep) {
+                    line.classList.add('completed');
+                }
+            });
+            
+            // Update step content
+            document.querySelectorAll('.consent-step').forEach((step, index) => {
+                step.style.display = index + 1 === currentStep ? 'block' : 'none';
+            });
+            
+            // Update buttons
+            document.getElementById('backButton').style.display = currentStep > 1 ? 'inline-block' : 'none';
+            document.getElementById('nextButton').style.display = currentStep < 3 ? 'inline-block' : 'none';
+            document.getElementById('startButton').style.display = currentStep === 3 ? 'inline-block' : 'none';
+            
+            // Update button states
+            updateButtonStates();
+        }
+        
+        function updateButtonStates() {
+            const nextButton = document.getElementById('nextButton');
+            const startButton = document.getElementById('startButton');
+            
+            if (currentStep === 1) {
+                nextButton.disabled = !selectedConsent;
+            } else if (currentStep === 2) {
+                nextButton.disabled = !uploadedDocument || !uploadedEvidence;
+            } else if (currentStep === 3) {
+                startButton.disabled = false;
+            }
+        }
+        
+        // File upload handlers
+        setupFileUpload('documentUploadZone', 'documentInput', 'documentPreview', 'documentName', 'documentSize', (file) => {
+            uploadedDocument = file;
+            updateButtonStates();
+        });
+        
+        setupFileUpload('evidenceUploadZone', 'evidenceInput', 'evidencePreview', 'evidenceName', 'evidenceSize', (file) => {
+            uploadedEvidence = file;
+            updateButtonStates();
+        });
+        
+        function setupFileUpload(uploadZoneId, inputId, previewId, nameId, sizeId, callback) {
+            const uploadZone = document.getElementById(uploadZoneId);
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            const nameElement = document.getElementById(nameId);
+            const sizeElement = document.getElementById(sizeId);
+            
+            uploadZone.addEventListener('click', () => input.click());
+            
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+            });
+            
+            uploadZone.addEventListener('dragleave', () => {
+                uploadZone.classList.remove('dragover');
+            });
+            
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+            
+            input.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+            
+            function handleFile(file) {
+                nameElement.textContent = file.name;
+                sizeElement.textContent = formatFileSize(file.size);
+                preview.classList.add('show');
+                
+                // Show image preview for evidence
+                if (previewId === 'evidencePreview' && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        document.getElementById('evidenceImage').src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+                
+                callback(file);
+            }
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Remove file handlers
+        document.getElementById('removeDocument').addEventListener('click', () => {
+            document.getElementById('documentPreview').classList.remove('show');
+            document.getElementById('documentInput').value = '';
+            uploadedDocument = null;
+            updateButtonStates();
+        });
+        
+        document.getElementById('removeEvidence').addEventListener('click', () => {
+            document.getElementById('evidencePreview').classList.remove('show');
+            document.getElementById('evidenceInput').value = '';
+            uploadedEvidence = null;
+            updateButtonStates();
+        });
+        
+        // Consent type selection
+        document.addEventListener('DOMContentLoaded', async () => {
+            const consentOptionsDiv = document.getElementById('consentOptions');
+            
+            try {
+                const response = await fetch('/api/ethics/consent_types');
+                const data = await response.json();
+                const consentTypes = data.consent_types;
+                
+                for (const key in consentTypes) {
+                    const consent = consentTypes[key];
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'consent-option';
+                    optionDiv.innerHTML = `
+                        <input type="radio" id="consent_${key}" name="consent_type" value="${key}">
+                        <label for="consent_${key}">
+                            ${consent.name}
+                            <p>${consent.description}</p>
+                        </label>
+                    `;
+                    consentOptionsDiv.appendChild(optionDiv);
+                    
+                    optionDiv.addEventListener('click', () => {
+                        document.querySelectorAll('.consent-option').forEach(opt => opt.classList.remove('selected'));
+                        optionDiv.classList.add('selected');
+                        document.getElementById(`consent_${key}`).checked = true;
+                        selectedConsent = key;
+                        updateButtonStates();
+                    });
+                }
+            } catch (error) {
+                console.error('Rıza türleri yüklenirken hata oluştu:', error);
+            }
+        });
+        
+        // Form submission
+        document.getElementById('consentForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (selectedConsent && uploadedDocument && uploadedEvidence) {
+                // Send consent data to backend
+                const consentData = {
+                    consent_type: selectedConsent,
+                    document: uploadedDocument,
+                    evidence: uploadedEvidence,
+                    timestamp: new Date().toISOString()
+                };
+                
+                console.log('Rıza verileri:', consentData);
+                
+                // Redirect to main application
+                window.location.href = '/';
+            }
+        });
+        
+        // Initialize
+        updateStepDisplay();
+    </script>
+</body>
+</html>

@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İş Detayı - AI Studio</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .job-detail-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .job-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+        }
+        
+        .job-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .job-subtitle {
+            opacity: 0.9;
+        }
+        
+        .job-content {
+            padding: 2rem;
+        }
+        
+        .job-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid #dee2e6;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: #6c757d;
+        }
+        
+        .info-value {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-running {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .metrics-section {
+            margin: 2rem 0;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid #dee2e6;
+            text-align: center;
+            position: relative;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .metric-chart {
+            width: 100%;
+            height: 100px;
+            margin-top: 1rem;
+        }
+        
+        .metric-trend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .trend-up {
+            color: #28a745;
+        }
+        
+        .trend-down {
+            color: #dc3545;
+        }
+        
+        .trend-stable {
+            color: #6c757d;
+        }
+        
+        .quality-indicator {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+        
+        .quality-excellent {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .quality-good {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .quality-fair {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .quality-poor {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .progress-section {
+            margin: 2rem 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .comparison-section {
+            margin: 2rem 0;
+        }
+        
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .comparison-item {
+            text-align: center;
+        }
+        
+        .comparison-image {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+        
+        .comparison-label {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .comparison-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .comparison-metric {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .comparison-metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .comparison-metric-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .actions-section {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .log-section {
+            margin: 2rem 0;
+        }
+        
+        .log-container {
+            background: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 10px;
+            padding: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+        
+        .log-timestamp {
+            color: #95a5a6;
+        }
+        
+        .log-level-info {
+            color: #3498db;
+        }
+        
+        .log-level-warning {
+            color: #f39c12;
+        }
+        
+        .log-level-error {
+            color: #e74c3c;
+        }
+        
+        .log-level-success {
+            color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+    <div class="job-detail-container">
+        <div class="job-header">
+            <h1 class="job-title">İş Detayı #<span id="job-id">123</span></h1>
+            <p class="job-subtitle">Face Swap - Yüz Değiştirme İşlemi</p>
+        </div>
+        
+        <div class="job-content">
+            <!-- Job Information -->
+            <div class="job-info-grid">
+                <div class="info-card">
+                    <div class="info-title">
+                        <i class="fas fa-info-circle"></i>
+                        Genel Bilgiler
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">İş Türü:</span>
+                        <span class="info-value">Face Swap</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Durum:</span>
+                        <span class="info-value">
+                            <span class="status-badge status-completed">Tamamlandı</span>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Oluşturulma:</span>
+                        <span class="info-value">2024-09-24 15:30:25</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Tamamlanma:</span>
+                        <span class="info-value">2024-09-24 15:32:18</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Toplam Süre:</span>
+                        <span class="info-value">1 dakika 53 saniye</span>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-title">
+                        <i class="fas fa-cog"></i>
+                        Kullanılan Parametreler
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Detector:</span>
+                        <span class="info-value">InsightFace</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Swapper:</span>
+                        <span class="info-value">inswapper_128.onnx</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Kalite:</span>
+                        <span class="info-value">High</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Renk Düzeltme:</span>
+                        <span class="info-value">Aktif</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Upscale:</span>
+                        <span class="info-value">2x</span>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-title">
+                        <i class="fas fa-file"></i>
+                        Dosya Bilgileri
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Giriş Dosyası:</span>
+                        <span class="info-value">input_video.mp4</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Çıkış Dosyası:</span>
+                        <span class="info-value">output_swapped.mp4</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Giriş Boyutu:</span>
+                        <span class="info-value">15.2 MB</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Çıkış Boyutu:</span>
+                        <span class="info-value">18.7 MB</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Çözünürlük:</span>
+                        <span class="info-value">1920x1080</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress Section -->
+            <div class="progress-section">
+                <h3>İşlem İlerlemesi</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%"></div>
+                </div>
+                <div class="progress-text">
+                    <strong>100%</strong> - İşlem tamamlandı
+                </div>
+            </div>
+            
+            <!-- Metrics Section -->
+            <div class="metrics-section">
+                <h3>Teknik Metrikler</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">95.2%</div>
+                        <div class="metric-label">Genel Kalite Skoru</div>
+                        <div class="quality-indicator quality-excellent">Mükemmel</div>
+                        <div class="metric-chart">
+                            <canvas id="quality-chart"></canvas>
+                        </div>
+                        <div class="metric-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+2.3%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-value">1.2</div>
+                        <div class="metric-label">Face Alignment Score</div>
+                        <div class="quality-indicator quality-excellent">Mükemmel</div>
+                        <div class="metric-chart">
+                            <canvas id="alignment-chart"></canvas>
+                        </div>
+                        <div class="metric-trend trend-stable">
+                            <i class="fas fa-minus"></i>
+                            <span>Stabil</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-value">3.4</div>
+                        <div class="metric-label">Color ΔE (CIELAB)</div>
+                        <div class="quality-indicator quality-good">İyi</div>
+                        <div class="metric-chart">
+                            <canvas id="color-chart"></canvas>
+                        </div>
+                        <div class="metric-trend trend-down">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>-0.8</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-value">0.8</div>
+                        <div class="metric-label">Temporal Jitter</div>
+                        <div class="quality-indicator quality-excellent">Mükemmel</div>
+                        <div class="metric-chart">
+                            <canvas id="jitter-chart"></canvas>
+                        </div>
+                        <div class="metric-trend trend-down">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>-0.3</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-value">0.92</div>
+                        <div class="metric-label">Lip-sync LSE-C</div>
+                        <div class="quality-indicator quality-excellent">Mükemmel</div>
+                        <div class="metric-chart">
+                            <canvas id="lipsync-chart"></canvas>
+                        </div>
+                        <div class="metric-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+0.05</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-value">32.5</div>
+                        <div class="metric-label">PSNR (dB)</div>
+                        <div class="quality-indicator quality-excellent">Mükemmel</div>
+                        <div class="metric-chart">
+                            <canvas id="psnr-chart"></canvas>
+                        </div>
+                        <div class="metric-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+1.2</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Comparison Section -->
+            <div class="comparison-section">
+                <h3>Öncesi vs Sonrası Karşılaştırması</h3>
+                <div class="comparison-container">
+                    <div class="comparison-item">
+                        <img class="comparison-image" src="/static/images/before.jpg" alt="Öncesi">
+                        <div class="comparison-label">Orijinal Görüntü</div>
+                        <div class="comparison-metrics">
+                            <div class="comparison-metric">
+                                <div class="comparison-metric-value">85.2%</div>
+                                <div class="comparison-metric-label">Kalite</div>
+                            </div>
+                            <div class="comparison-metric">
+                                <div class="comparison-metric-value">2.1</div>
+                                <div class="comparison-metric-label">Alignment</div>
+                            </div>
+                            <div class="comparison-metric">
+                                <div class="comparison-metric-value">5.2</div>
+                                <div class="comparison-metric-label">Color ΔE</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-item">
+                        <img class="comparison-image" src="/static/images/after.jpg" alt="Sonrası">
+                        <div class="comparison-label">İşlenmiş Görüntü</div>
+                        <div class="comparison-metrics">
+                            <div class="comparison-metric">
+                                <div class="comparison-metric-value">95.2%</div>
+                                <div class="comparison-metric-label">Kalite</div>
+                            </div>
+                            <div class="comparison-metric">
+                                <div class="comparison-metric-value">1.2</div>
+                                <div class="comparison-metric-label">Alignment</div>
+                            </div>
+                            <div class="comparison-metric">
+                                <div class="comparison-metric-value">3.4</div>
+                                <div class="comparison-metric-label">Color ΔE</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions Section -->
+            <div class="actions-section">
+                <h3>İşlemler</h3>
+                <div class="action-buttons">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-download"></i>
+                        Çıktıyı İndir
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-redo"></i>
+                        Yeniden İşle
+                    </button>
+                    <button class="btn btn-success">
+                        <i class="fas fa-share"></i>
+                        Paylaş
+                    </button>
+                    <button class="btn btn-danger">
+                        <i class="fas fa-trash"></i>
+                        Sil
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Log Section -->
+            <div class="log-section">
+                <h3>İşlem Logları</h3>
+                <div class="log-container">
+                    <div class="log-entry">
+                        <span class="log-timestamp">[15:30:25]</span>
+                        <span class="log-level-info">[INFO]</span>
+                        İş başlatıldı: Face Swap
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">[15:30:26]</span>
+                        <span class="log-level-info">[INFO]</span>
+                        Giriş dosyası yüklendi: input_video.mp4
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">[15:30:27]</span>
+                        <span class="log-level-info">[INFO]</span>
+                        Yüz tespiti başlatıldı (InsightFace)
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">[15:30:45]</span>
+                        <span class="log-level-success">[SUCCESS]</span>
+                        Yüz tespiti tamamlandı: 15 yüz bulundu
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">[15:30:46]</span>
+                        <span class="log-level-info">[INFO]</span>
+                        Yüz değiştirme başlatıldı (inswapper_128.onnx)
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">[15:31:30]</span>
+                        <span class="log-level-success">[SUCCESS]</span>
+                        Yüz değiştirme tamamlandı
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">[15:31:31]</span>
+                        <span class="log-level-info">[INFO]</span>
+                        Renk düzeltme uygulanıyor
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">[15:31:45]</span>
+                        <span class="log-level-success">[SUCCESS]</span>
+                        Renk düzeltme tamamlandı
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">[15:31:46]</span>
+                        <span class="log-level-info">[INFO]</span>
+                        Video birleştirme başlatıldı
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">[15:32:18]</span>
+                        <span class="log-level-success">[SUCCESS]</span>
+                        İş tamamlandı: output_swapped.mp4
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Quality Chart
+            const qualityCtx = document.getElementById('quality-chart').getContext('2d');
+            new Chart(qualityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['0%', '20%', '40%', '60%', '80%', '100%'],
+                    datasets: [{
+                        label: 'Kalite Skoru',
+                        data: [85, 87, 89, 91, 93, 95.2],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+            
+            // Alignment Chart
+            const alignmentCtx = document.getElementById('alignment-chart').getContext('2d');
+            new Chart(alignmentCtx, {
+                type: 'line',
+                data: {
+                    labels: ['0%', '20%', '40%', '60%', '80%', '100%'],
+                    datasets: [{
+                        label: 'Alignment Score',
+                        data: [2.1, 1.9, 1.7, 1.5, 1.3, 1.2],
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Color Chart
+            const colorCtx = document.getElementById('color-chart').getContext('2d');
+            new Chart(colorCtx, {
+                type: 'line',
+                data: {
+                    labels: ['0%', '20%', '40%', '60%', '80%', '100%'],
+                    datasets: [{
+                        label: 'Color ΔE',
+                        data: [5.2, 4.8, 4.4, 4.0, 3.7, 3.4],
+                        borderColor: '#f39c12',
+                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Jitter Chart
+            const jitterCtx = document.getElementById('jitter-chart').getContext('2d');
+            new Chart(jitterCtx, {
+                type: 'line',
+                data: {
+                    labels: ['0%', '20%', '40%', '60%', '80%', '100%'],
+                    datasets: [{
+                        label: 'Temporal Jitter',
+                        data: [1.1, 1.0, 0.9, 0.9, 0.8, 0.8],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Lip-sync Chart
+            const lipsyncCtx = document.getElementById('lipsync-chart').getContext('2d');
+            new Chart(lipsyncCtx, {
+                type: 'line',
+                data: {
+                    labels: ['0%', '20%', '40%', '60%', '80%', '100%'],
+                    datasets: [{
+                        label: 'Lip-sync LSE-C',
+                        data: [0.87, 0.88, 0.89, 0.90, 0.91, 0.92],
+                        borderColor: '#9b59b6',
+                        backgroundColor: 'rgba(155, 89, 182, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1
+                        }
+                    }
+                }
+            });
+            
+            // PSNR Chart
+            const psnrCtx = document.getElementById('psnr-chart').getContext('2d');
+            new Chart(psnrCtx, {
+                type: 'line',
+                data: {
+                    labels: ['0%', '20%', '40%', '60%', '80%', '100%'],
+                    datasets: [{
+                        label: 'PSNR (dB)',
+                        data: [31.3, 31.5, 31.7, 31.9, 32.1, 32.5],
+                        borderColor: '#1abc9c',
+                        backgroundColor: 'rgba(26, 188, 156, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Studio - Açık Kaynak Bilgilendirmesi</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .open-source-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .open-source-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .open-source-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .open-source-subtitle {
+            opacity: 0.9;
+        }
+        
+        .open-source-content {
+            padding: 2rem;
+        }
+        
+        .open-source-intro {
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .open-source-intro h2 {
+            color: #155724;
+            margin-bottom: 1rem;
+        }
+        
+        .open-source-intro p {
+            color: #155724;
+            line-height: 1.6;
+        }
+        
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .model-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+        
+        .model-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .model-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .model-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+        
+        .model-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .model-description {
+            color: #6c757d;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .model-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .model-detail {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .model-detail-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 0.25rem;
+        }
+        
+        .model-detail-value {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .model-links {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .model-link {
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .model-link:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .model-link.github {
+            background: #24292e;
+        }
+        
+        .model-link.github:hover {
+            background: #1a1e22;
+        }
+        
+        .model-link.paper {
+            background: #e74c3c;
+        }
+        
+        .model-link.paper:hover {
+            background: #c0392b;
+        }
+        
+        .license-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .license-title {
+            color: #856404;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .license-text {
+            color: #856404;
+            line-height: 1.6;
+        }
+        
+        .acknowledgments {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .acknowledgments-title {
+            color: #0c5460;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .acknowledgments-text {
+            color: #0c5460;
+            line-height: 1.6;
+        }
+        
+        .back-button {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="open-source-container">
+        <div class="open-source-header">
+            <h1 class="open-source-title">🔓 Açık Kaynak Bilgilendirmesi</h1>
+            <p class="open-source-subtitle">Kullandığımız açık kaynaklı AI modelleri ve kütüphaneler</p>
+        </div>
+        
+        <div class="open-source-content">
+            <div class="open-source-intro">
+                <h2>🛡️ Şeffaflık ve Topluluk Desteği</h2>
+                <p>
+                    AI Studio, açık kaynaklı topluluğun katkıları sayesinde mümkün olmuştur. 
+                    Aşağıda kullandığımız tüm açık kaynaklı modeller, kütüphaneler ve araçların 
+                    detaylı bilgilerini bulabilirsiniz. Bu şeffaflık, projemizin güvenilirliğini 
+                    ve topluluğa olan saygımızı gösterir.
+                </p>
+            </div>
+            
+            <div class="models-grid">
+                <!-- GFPGAN -->
+                <div class="model-card">
+                    <div class="model-header">
+                        <div class="model-icon">✨</div>
+                        <div class="model-title">GFPGAN</div>
+                    </div>
+                    <div class="model-description">
+                        Yüz iyileştirme ve restorasyon için kullanılan gelişmiş AI modeli. 
+                        Düşük kaliteli yüz görüntülerini yüksek kaliteye dönüştürür.
+                    </div>
+                    <div class="model-details">
+                        <div class="model-detail">
+                            <div class="model-detail-label">Lisans</div>
+                            <div class="model-detail-value">Apache 2.0</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Geliştirici</div>
+                            <div class="model-detail-value">Tencent ARC</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Yayın Tarihi</div>
+                            <div class="model-detail-value">2021</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Kullanım Alanı</div>
+                            <div class="model-detail-value">Face Enhancement</div>
+                        </div>
+                    </div>
+                    <div class="model-links">
+                        <a href="https://github.com/TencentARC/GFPGAN" class="model-link github" target="_blank">
+                            <i class="fab fa-github"></i> GitHub
+                        </a>
+                        <a href="https://arxiv.org/abs/2101.04061" class="model-link paper" target="_blank">
+                            <i class="fas fa-file-pdf"></i> Paper
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- SadTalker -->
+                <div class="model-card">
+                    <div class="model-header">
+                        <div class="model-icon">🗣️</div>
+                        <div class="model-title">SadTalker</div>
+                    </div>
+                    <div class="model-description">
+                        Konuşan kafa üretimi için kullanılan AI modeli. 
+                        Statik görüntülerden doğal konuşan videolar oluşturur.
+                    </div>
+                    <div class="model-details">
+                        <div class="model-detail">
+                            <div class="model-detail-label">Lisans</div>
+                            <div class="model-detail-value">MIT</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Geliştirici</div>
+                            <div class="model-detail-value">OpenXLab</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Yayın Tarihi</div>
+                            <div class="model-detail-value">2023</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Kullanım Alanı</div>
+                            <div class="model-detail-value">Talking Head</div>
+                        </div>
+                    </div>
+                    <div class="model-links">
+                        <a href="https://github.com/OpenTalker/SadTalker" class="model-link github" target="_blank">
+                            <i class="fab fa-github"></i> GitHub
+                        </a>
+                        <a href="https://arxiv.org/abs/2211.12194" class="model-link paper" target="_blank">
+                            <i class="fas fa-file-pdf"></i> Paper
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- InsightFace -->
+                <div class="model-card">
+                    <div class="model-header">
+                        <div class="model-icon">🎭</div>
+                        <div class="model-title">InsightFace</div>
+                    </div>
+                    <div class="model-description">
+                        Yüz tanıma ve değiştirme için kullanılan güçlü AI modeli. 
+                        Yüksek doğrulukta yüz tespiti ve değiştirme işlemleri yapar.
+                    </div>
+                    <div class="model-details">
+                        <div class="model-detail">
+                            <div class="model-detail-label">Lisans</div>
+                            <div class="model-detail-value">MIT</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Geliştirici</div>
+                            <div class="model-detail-value">InsightFace</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Yayın Tarihi</div>
+                            <div class="model-detail-value">2019</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Kullanım Alanı</div>
+                            <div class="model-detail-value">Face Recognition</div>
+                        </div>
+                    </div>
+                    <div class="model-links">
+                        <a href="https://github.com/deepinsight/insightface" class="model-link github" target="_blank">
+                            <i class="fab fa-github"></i> GitHub
+                        </a>
+                        <a href="https://arxiv.org/abs/1801.07698" class="model-link paper" target="_blank">
+                            <i class="fas fa-file-pdf"></i> Paper
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- OpenCV -->
+                <div class="model-card">
+                    <div class="model-header">
+                        <div class="model-icon">👁️</div>
+                        <div class="model-title">OpenCV</div>
+                    </div>
+                    <div class="model-description">
+                        Computer vision işlemleri için kullanılan temel kütüphane. 
+                        Görüntü işleme, yüz tespiti ve video işleme fonksiyonları sağlar.
+                    </div>
+                    <div class="model-details">
+                        <div class="model-detail">
+                            <div class="model-detail-label">Lisans</div>
+                            <div class="model-detail-value">Apache 2.0</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Geliştirici</div>
+                            <div class="model-detail-value">OpenCV Team</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Yayın Tarihi</div>
+                            <div class="model-detail-value">2000</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Kullanım Alanı</div>
+                            <div class="model-detail-value">Computer Vision</div>
+                        </div>
+                    </div>
+                    <div class="model-links">
+                        <a href="https://github.com/opencv/opencv" class="model-link github" target="_blank">
+                            <i class="fab fa-github"></i> GitHub
+                        </a>
+                        <a href="https://opencv.org/" class="model-link" target="_blank">
+                            <i class="fas fa-globe"></i> Website
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- PyTorch -->
+                <div class="model-card">
+                    <div class="model-header">
+                        <div class="model-icon">🔥</div>
+                        <div class="model-title">PyTorch</div>
+                    </div>
+                    <div class="model-description">
+                        Deep learning framework'ü. AI modellerinin eğitimi ve çıkarımı için kullanılır.
+                    </div>
+                    <div class="model-details">
+                        <div class="model-detail">
+                            <div class="model-detail-label">Lisans</div>
+                            <div class="model-detail-value">BSD-3-Clause</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Geliştirici</div>
+                            <div class="model-detail-value">Meta AI</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Yayın Tarihi</div>
+                            <div class="model-detail-value">2016</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Kullanım Alanı</div>
+                            <div class="model-detail-value">Deep Learning</div>
+                        </div>
+                    </div>
+                    <div class="model-links">
+                        <a href="https://github.com/pytorch/pytorch" class="model-link github" target="_blank">
+                            <i class="fab fa-github"></i> GitHub
+                        </a>
+                        <a href="https://pytorch.org/" class="model-link" target="_blank">
+                            <i class="fas fa-globe"></i> Website
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- MediaPipe -->
+                <div class="model-card">
+                    <div class="model-header">
+                        <div class="model-icon">📱</div>
+                        <div class="model-title">MediaPipe</div>
+                    </div>
+                    <div class="model-description">
+                        Google tarafından geliştirilen multimedia machine learning framework'ü. 
+                        Yüz tespiti ve landmark tespiti için kullanılır.
+                    </div>
+                    <div class="model-details">
+                        <div class="model-detail">
+                            <div class="model-detail-label">Lisans</div>
+                            <div class="model-detail-value">Apache 2.0</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Geliştirici</div>
+                            <div class="model-detail-value">Google</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Yayın Tarihi</div>
+                            <div class="model-detail-value">2019</div>
+                        </div>
+                        <div class="model-detail">
+                            <div class="model-detail-label">Kullanım Alanı</div>
+                            <div class="model-detail-value">Media Processing</div>
+                        </div>
+                    </div>
+                    <div class="model-links">
+                        <a href="https://github.com/google/mediapipe" class="model-link github" target="_blank">
+                            <i class="fab fa-github"></i> GitHub
+                        </a>
+                        <a href="https://mediapipe.dev/" class="model-link" target="_blank">
+                            <i class="fas fa-globe"></i> Website
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="license-section">
+                <div class="license-title">📜 Lisans Bilgileri</div>
+                <div class="license-text">
+                    <p>
+                        Bu projede kullanılan tüm açık kaynaklı yazılımlar, kendi lisansları altında 
+                        dağıtılmaktadır. Kullanılan lisanslar:
+                    </p>
+                    <ul>
+                        <li><strong>Apache 2.0:</strong> GFPGAN, OpenCV, MediaPipe</li>
+                        <li><strong>MIT:</strong> SadTalker, InsightFace</li>
+                        <li><strong>BSD-3-Clause:</strong> PyTorch</li>
+                    </ul>
+                    <p>
+                        Bu lisanslar, ticari kullanıma izin verir ve kaynak kodun açık olmasını gerektirir. 
+                        Detaylı lisans bilgileri için ilgili projelerin GitHub sayfalarını ziyaret edebilirsiniz.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="acknowledgments">
+                <div class="acknowledgments-title">🙏 Teşekkürler</div>
+                <div class="acknowledgments-text">
+                    <p>
+                        Bu proje, açık kaynaklı topluluğun katkıları sayesinde mümkün olmuştur. 
+                        Özellikle şu projelerin geliştiricilerine teşekkür ederiz:
+                    </p>
+                    <ul>
+                        <li>Tencent ARC ekibi - GFPGAN modeli</li>
+                        <li>OpenXLab ekibi - SadTalker modeli</li>
+                        <li>InsightFace ekibi - Yüz tanıma modelleri</li>
+                        <li>OpenCV topluluğu - Computer vision kütüphanesi</li>
+                        <li>Meta AI ekibi - PyTorch framework'ü</li>
+                        <li>Google ekibi - MediaPipe framework'ü</li>
+                    </ul>
+                    <p>
+                        Bu projeler olmadan AI Studio'nun mevcut özelliklerine sahip olması mümkün olmazdı. 
+                        Açık kaynaklı topluluğa olan saygımızı ve desteğimizi sürdürmeye devam edeceğiz.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="back-button">
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i>
+                    Ana Sayfaya Dön
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consent Workflow - AI Studio</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .consent-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .consent-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .consent-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .consent-subtitle {
+            opacity: 0.9;
+        }
+        
+        .consent-content {
+            padding: 2rem;
+        }
+        
+        .consent-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .warning-icon {
+            font-size: 2rem;
+            color: #f39c12;
+        }
+        
+        .warning-text h3 {
+            margin: 0 0 0.5rem 0;
+            color: #856404;
+        }
+        
+        .warning-text p {
+            margin: 0;
+            color: #856404;
+            line-height: 1.5;
+        }
+        
+        .consent-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .consent-card {
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .consent-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .consent-card.selected {
+            border-color: #27ae60;
+            background: #f8fff8;
+        }
+        
+        .consent-card.selected::before {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #27ae60;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .consent-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .consent-card h3 {
+            margin: 0 0 0.5rem 0;
+            color: #2c3e50;
+        }
+        
+        .consent-card p {
+            margin: 0 0 1rem 0;
+            color: #6c757d;
+        }
+        
+        .consent-badges {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .badge.green {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge.orange {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge.red {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge.small, .badge.medium, .badge.large {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .consent-evidence {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .consent-evidence h3 {
+            margin: 0 0 1rem 0;
+            color: #2c3e50;
+        }
+        
+        .file-upload {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .file-upload.dragover {
+            border-color: #27ae60;
+            background: #f8fff8;
+        }
+        
+        .file-upload-icon {
+            font-size: 3rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+        
+        .file-info {
+            margin-top: 1rem;
+            color: #6c757d;
+        }
+        
+        .consent-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .consent-summary {
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .consent-summary h3 {
+            margin: 0 0 1rem 0;
+            color: #155724;
+        }
+        
+        .consent-summary ul {
+            margin: 0;
+            padding-left: 1.5rem;
+            color: #155724;
+        }
+        
+        .consent-summary li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="consent-container">
+        <div class="consent-header">
+            <h1 class="consent-title">🔒 Rıza ve Güvenlik</h1>
+            <p class="consent-subtitle">AI işlemleri yapmadan önce rıza durumunu belirtmeniz gerekiyor</p>
+        </div>
+        
+        <div class="consent-content">
+            <div class="consent-warning">
+                <div class="warning-icon">⚠️</div>
+                <div class="warning-text">
+                    <h3>Yasal Uyarı</h3>
+                    <p>AI işlemleri yapmadan önce kişilerin rızasını almanız gerekmektedir. 
+                    Rıza durumuna göre işlem türleri ve filigran politikaları değişir.</p>
+                </div>
+            </div>
+            
+            <div class="consent-options">
+                <div class="consent-card" data-consent="consented">
+                    <div class="consent-icon">✅</div>
+                    <h3>Açık Rıza</h3>
+                    <p>Kişi açık rıza vermiş</p>
+                    <div class="consent-badges">
+                        <span class="badge green">Tüm İşlemler</span>
+                        <span class="badge small">Küçük Filigran</span>
+                    </div>
+                </div>
+                
+                <div class="consent-card" data-consent="demo">
+                    <div class="consent-icon">🎭</div>
+                    <h3>Demo/Kurgu</h3>
+                    <p>Eğitim veya demo amaçlı</p>
+                    <div class="consent-badges">
+                        <span class="badge orange">Sınırlı İşlemler</span>
+                        <span class="badge medium">Orta Filigran</span>
+                    </div>
+                </div>
+                
+                <div class="consent-card" data-consent="unknown">
+                    <div class="consent-icon">❓</div>
+                    <h3>Bilinmeyen</h3>
+                    <p>Rıza durumu belirsiz</p>
+                    <div class="consent-badges">
+                        <span class="badge red">Temel İşlemler</span>
+                        <span class="badge large">Büyük Filigran</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="consent-evidence" id="consent-evidence" style="display: none;">
+                <h3>📄 Rıza Kanıtı</h3>
+                <p>Açık rıza için kanıt dosyası yükleyin:</p>
+                <div class="file-upload" id="file-upload">
+                    <div class="file-upload-icon">📁</div>
+                    <p>Dosyayı sürükleyip bırakın veya tıklayarak seçin</p>
+                    <input type="file" id="consent-file" accept=".pdf,.jpg,.png,.doc,.docx" style="display: none;">
+                    <div class="file-info">
+                        <small>Desteklenen formatlar: PDF, JPG, PNG, DOC, DOCX</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="consent-summary" id="consent-summary" style="display: none;">
+                <h3>📋 Seçim Özeti</h3>
+                <ul id="consent-details">
+                    <!-- Dinamik olarak doldurulacak -->
+                </ul>
+            </div>
+            
+            <div class="consent-actions">
+                <button class="btn btn-secondary" onclick="window.history.back()">Geri</button>
+                <button class="btn btn-primary" id="continue-btn" disabled>Devam Et</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedConsent = null;
+        let evidenceFile = null;
+        
+        // Consent card seçimi
+        document.querySelectorAll('.consent-card').forEach(card => {
+            card.addEventListener('click', () => {
+                // Önceki seçimi temizle
+                document.querySelectorAll('.consent-card').forEach(c => c.classList.remove('selected'));
+                
+                // Yeni seçimi işaretle
+                card.classList.add('selected');
+                selectedConsent = card.dataset.consent;
+                
+                // Kanıt gereksinimi kontrolü
+                const evidenceDiv = document.getElementById('consent-evidence');
+                if (selectedConsent === 'consented') {
+                    evidenceDiv.style.display = 'block';
+                } else {
+                    evidenceDiv.style.display = 'none';
+                    evidenceFile = null;
+                }
+                
+                updateSummary();
+                updateContinueButton();
+            });
+        });
+        
+        // Dosya yükleme
+        const fileUpload = document.getElementById('file-upload');
+        const fileInput = document.getElementById('consent-file');
+        
+        fileUpload.addEventListener('click', () => fileInput.click());
+        
+        fileUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUpload.classList.add('dragover');
+        });
+        
+        fileUpload.addEventListener('dragleave', () => {
+            fileUpload.classList.remove('dragover');
+        });
+        
+        fileUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUpload.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        function handleFile(file) {
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            
+            if (allowedTypes.includes(file.type)) {
+                evidenceFile = file;
+                fileUpload.innerHTML = `
+                    <div class="file-upload-icon">✅</div>
+                    <p><strong>${file.name}</strong></p>
+                    <p>Dosya yüklendi</p>
+                `;
+                updateContinueButton();
+            } else {
+                alert('Desteklenmeyen dosya türü. Lütfen PDF, JPG, PNG, DOC veya DOCX dosyası seçin.');
+            }
+        }
+        
+        function updateSummary() {
+            if (!selectedConsent) return;
+            
+            const summary = document.getElementById('consent-summary');
+            const details = document.getElementById('consent-details');
+            
+            const consentInfo = {
+                'consented': {
+                    name: 'Açık Rıza',
+                    operations: ['Face Swap', 'Talking Head', 'Face Enhance', 'Video Process', 'Color Grade', 'Background Replace'],
+                    watermark: 'Küçük filigran (%15 opaklık)',
+                    evidence: 'Kanıt dosyası gerekli'
+                },
+                'demo': {
+                    name: 'Demo/Kurgu',
+                    operations: ['Face Detect', 'Face Enhance', 'Color Grade', 'Audio Enhance'],
+                    watermark: 'Orta filigran (%20 opaklık)',
+                    evidence: 'Kanıt dosyası gerekmez'
+                },
+                'unknown': {
+                    name: 'Bilinmeyen',
+                    operations: ['Face Detect', 'Color Grade', 'Audio Enhance'],
+                    watermark: 'Büyük filigran (%25 opaklık)',
+                    evidence: 'Kanıt dosyası gerekli'
+                }
+            };
+            
+            const info = consentInfo[selectedConsent];
+            
+            details.innerHTML = `
+                <li><strong>Rıza Türü:</strong> ${info.name}</li>
+                <li><strong>İzin Verilen İşlemler:</strong> ${info.operations.join(', ')}</li>
+                <li><strong>Filigran Politikası:</strong> ${info.watermark}</li>
+                <li><strong>Kanıt Gereksinimi:</strong> ${info.evidence}</li>
+            `;
+            
+            summary.style.display = 'block';
+        }
+        
+        function updateContinueButton() {
+            const continueBtn = document.getElementById('continue-btn');
+            
+            if (!selectedConsent) {
+                continueBtn.disabled = true;
+                return;
+            }
+            
+            if (selectedConsent === 'consented' && !evidenceFile) {
+                continueBtn.disabled = true;
+                return;
+            }
+            
+            continueBtn.disabled = false;
+        }
+        
+        // Devam et butonu
+        document.getElementById('continue-btn').addEventListener('click', () => {
+            if (selectedConsent) {
+                // Consent bilgilerini localStorage'a kaydet
+                const consentData = {
+                    type: selectedConsent,
+                    evidence: evidenceFile ? evidenceFile.name : null,
+                    timestamp: new Date().toISOString()
+                };
+                
+                localStorage.setItem('consent_data', JSON.stringify(consentData));
+                
+                // Ana sayfaya yönlendir
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+</html>

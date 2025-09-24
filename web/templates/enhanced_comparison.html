@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Studio - Gelişmiş Karşılaştırma</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .comparison-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .comparison-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .comparison-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .comparison-subtitle {
+            opacity: 0.9;
+        }
+        
+        .comparison-content {
+            padding: 2rem;
+        }
+        
+        .comparison-slider-container {
+            position: relative;
+            margin: 2rem 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: #000;
+        }
+        
+        .comparison-slider {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            cursor: ew-resize;
+        }
+        
+        .comparison-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .comparison-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            border-right: 3px solid #fff;
+        }
+        
+        .comparison-slider-handle {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 4px;
+            height: 100%;
+            background: #fff;
+            cursor: ew-resize;
+            z-index: 10;
+            transition: all 0.1s ease;
+        }
+        
+        .comparison-slider-handle:hover {
+            width: 6px;
+        }
+        
+        .comparison-slider-handle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -12px;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .comparison-slider-handle::after {
+            content: '⟷';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .comparison-labels {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 5;
+        }
+        
+        .comparison-label {
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+        
+        .comparison-label.original {
+            background: rgba(52, 152, 219, 0.8);
+        }
+        
+        .comparison-label.processed {
+            background: rgba(46, 204, 113, 0.8);
+        }
+        
+        .comparison-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .control-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .control-button:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .control-button.active {
+            background: #28a745;
+        }
+        
+        .comparison-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .metric-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+        
+        .metric-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .metric-change {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .metric-change.positive {
+            color: #28a745;
+        }
+        
+        .metric-change.negative {
+            color: #dc3545;
+        }
+        
+        .comparison-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .detail-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid #dee2e6;
+        }
+        
+        .detail-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            color: #6c757d;
+        }
+        
+        .detail-value {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .comparison-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .action-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .action-button.secondary {
+            background: #6c757d;
+        }
+        
+        .action-button.secondary:hover {
+            background: #5a6268;
+        }
+        
+        .comparison-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .gallery-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        
+        .gallery-item-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .comparison-timeline {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .timeline-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+        
+        .timeline-content {
+            flex: 1;
+        }
+        
+        .timeline-title-text {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+        
+        .timeline-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .timeline-time {
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="comparison-container">
+        <div class="comparison-header">
+            <h1 class="comparison-title">🔄 Gelişmiş Karşılaştırma Modu</h1>
+            <p class="comparison-subtitle">Öncesi ve sonrası görüntüleri interaktif olarak karşılaştırın</p>
+        </div>
+        
+        <div class="comparison-content">
+            <!-- Comparison Slider -->
+            <div class="comparison-slider-container">
+                <div class="comparison-slider" id="comparisonSlider">
+                    <img class="comparison-image" id="originalImage" src="/static/images/before.jpg" alt="Orijinal">
+                    <div class="comparison-overlay" id="comparisonOverlay">
+                        <img class="comparison-image" id="processedImage" src="/static/images/after.jpg" alt="İşlenmiş">
+                    </div>
+                    <div class="comparison-slider-handle" id="sliderHandle"></div>
+                    <div class="comparison-labels">
+                        <div class="comparison-label original">Orijinal</div>
+                        <div class="comparison-label processed">İşlenmiş</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Comparison Controls -->
+            <div class="comparison-controls">
+                <button class="control-button active" data-mode="slider">
+                    <i class="fas fa-arrows-alt-h"></i> Kaydırma Modu
+                </button>
+                <button class="control-button" data-mode="fade">
+                    <i class="fas fa-eye"></i> Geçiş Modu
+                </button>
+                <button class="control-button" data-mode="split">
+                    <i class="fas fa-columns"></i> Bölünmüş Görünüm
+                </button>
+                <button class="control-button" data-mode="overlay">
+                    <i class="fas fa-layer-group"></i> Katman Modu
+                </button>
+            </div>
+            
+            <!-- Comparison Metrics -->
+            <div class="comparison-metrics">
+                <div class="metric-card">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-value">95.2%</div>
+                    <div class="metric-label">Genel Kalite</div>
+                    <div class="metric-change positive">+10.2%</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">🎯</div>
+                    <div class="metric-value">1.2</div>
+                    <div class="metric-label">Face Alignment</div>
+                    <div class="metric-change positive">-0.9</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">🎨</div>
+                    <div class="metric-value">3.4</div>
+                    <div class="metric-label">Color ΔE</div>
+                    <div class="metric-change positive">-1.8</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">⚡</div>
+                    <div class="metric-value">0.8</div>
+                    <div class="metric-label">Temporal Jitter</div>
+                    <div class="metric-change positive">-0.3</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">🔊</div>
+                    <div class="metric-value">0.92</div>
+                    <div class="metric-label">Lip-sync LSE</div>
+                    <div class="metric-change positive">+0.05</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">📈</div>
+                    <div class="metric-value">32.5</div>
+                    <div class="metric-label">PSNR (dB)</div>
+                    <div class="metric-change positive">+1.2</div>
+                </div>
+            </div>
+            
+            <!-- Comparison Details -->
+            <div class="comparison-details">
+                <div class="detail-section">
+                    <div class="detail-title">
+                        <i class="fas fa-info-circle"></i>
+                        Orijinal Görüntü Bilgileri
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Dosya Adı:</span>
+                        <span class="detail-value">input_video.mp4</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Boyut:</span>
+                        <span class="detail-value">15.2 MB</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Çözünürlük:</span>
+                        <span class="detail-value">1920x1080</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Format:</span>
+                        <span class="detail-value">MP4</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Süre:</span>
+                        <span class="detail-value">2:34</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">FPS:</span>
+                        <span class="detail-value">30</span>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-title">
+                        <i class="fas fa-magic"></i>
+                        İşlenmiş Görüntü Bilgileri
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Dosya Adı:</span>
+                        <span class="detail-value">output_processed.mp4</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Boyut:</span>
+                        <span class="detail-value">18.7 MB</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Çözünürlük:</span>
+                        <span class="detail-value">1920x1080</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Format:</span>
+                        <span class="detail-value">MP4</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Süre:</span>
+                        <span class="detail-value">2:34</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">FPS:</span>
+                        <span class="detail-value">30</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Processing Timeline -->
+            <div class="comparison-timeline">
+                <div class="timeline-title">İşlem Zaman Çizelgesi</div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-title-text">İşlem Başlatıldı</div>
+                        <div class="timeline-description">Face swap işlemi başlatıldı</div>
+                        <div class="timeline-time">15:30:25</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-title-text">Yüz Tespiti</div>
+                        <div class="timeline-description">15 yüz tespit edildi</div>
+                        <div class="timeline-time">15:30:45</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-title-text">Yüz Değiştirme</div>
+                        <div class="timeline-description">InsightFace ile yüz değiştirme</div>
+                        <div class="timeline-time">15:31:30</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-title-text">Renk Düzeltme</div>
+                        <div class="timeline-description">Renk uyumu sağlandı</div>
+                        <div class="timeline-time">15:31:45</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-title-text">İşlem Tamamlandı</div>
+                        <div class="timeline-description">Video başarıyla oluşturuldu</div>
+                        <div class="timeline-time">15:32:18</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Comparison Gallery -->
+            <div class="comparison-gallery">
+                <div class="gallery-item">
+                    <img src="/static/images/before.jpg" alt="Orijinal">
+                    <div class="gallery-item-label">Orijinal</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/images/after.jpg" alt="İşlenmiş">
+                    <div class="gallery-item-label">İşlenmiş</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/images/difference.jpg" alt="Fark">
+                    <div class="gallery-item-label">Fark Haritası</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/images/heatmap.jpg" alt="Heatmap">
+                    <div class="gallery-item-label">Kalite Heatmap</div>
+                </div>
+            </div>
+            
+            <!-- Comparison Actions -->
+            <div class="comparison-actions">
+                <button class="action-button">
+                    <i class="fas fa-download"></i>
+                    İşlenmiş Videoyu İndir
+                </button>
+                <button class="action-button secondary">
+                    <i class="fas fa-share"></i>
+                    Karşılaştırmayı Paylaş
+                </button>
+                <button class="action-button secondary">
+                    <i class="fas fa-redo"></i>
+                    Yeniden İşle
+                </button>
+                <a href="/" class="action-button secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Ana Sayfaya Dön
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Comparison slider functionality
+        const slider = document.getElementById('comparisonSlider');
+        const handle = document.getElementById('sliderHandle');
+        const overlay = document.getElementById('comparisonOverlay');
+        const originalImage = document.getElementById('originalImage');
+        const processedImage = document.getElementById('processedImage');
+        
+        let isDragging = false;
+        let currentMode = 'slider';
+        
+        // Initialize slider
+        function initSlider() {
+            handle.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+            
+            // Touch events for mobile
+            handle.addEventListener('touchstart', startDrag);
+            document.addEventListener('touchmove', drag);
+            document.addEventListener('touchend', stopDrag);
+        }
+        
+        function startDrag(e) {
+            isDragging = true;
+            e.preventDefault();
+        }
+        
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const rect = slider.getBoundingClientRect();
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            const percentage = Math.max(0, Math.min(100, ((x - rect.left) / rect.width) * 100));
+            
+            updateSlider(percentage);
+        }
+        
+        function stopDrag() {
+            isDragging = false;
+        }
+        
+        function updateSlider(percentage) {
+            handle.style.left = percentage + '%';
+            overlay.style.width = percentage + '%';
+        }
+        
+        // Control buttons
+        document.querySelectorAll('.control-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.control-button').forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Get mode from data attribute
+                currentMode = button.dataset.mode;
+                applyMode(currentMode);
+            });
+        });
+        
+        function applyMode(mode) {
+            switch(mode) {
+                case 'slider':
+                    slider.style.cursor = 'ew-resize';
+                    handle.style.display = 'block';
+                    overlay.style.display = 'block';
+                    break;
+                case 'fade':
+                    slider.style.cursor = 'pointer';
+                    handle.style.display = 'none';
+                    overlay.style.display = 'block';
+                    overlay.style.opacity = '0.5';
+                    break;
+                case 'split':
+                    slider.style.cursor = 'default';
+                    handle.style.display = 'none';
+                    overlay.style.display = 'block';
+                    overlay.style.width = '50%';
+                    break;
+                case 'overlay':
+                    slider.style.cursor = 'pointer';
+                    handle.style.display = 'none';
+                    overlay.style.display = 'block';
+                    overlay.style.width = '100%';
+                    overlay.style.opacity = '0.7';
+                    break;
+            }
+        }
+        
+        // Gallery item click handlers
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const img = item.querySelector('img');
+                const label = item.querySelector('.gallery-item-label').textContent;
+                
+                if (label === 'Orijinal') {
+                    originalImage.src = img.src;
+                } else if (label === 'İşlenmiş') {
+                    processedImage.src = img.src;
+                }
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initSlider();
+            applyMode('slider');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+models:
+  face_detection:
+    available:
+    - opencv
+    - mediapipe
+    - insightface
+    default: insightface
+  face_enhancement:
+    available:
+    - opencv
+    - gfpgan
+    - real_esrgan
+    default: gfpgan
+  face_swapping:
+    available:
+    - opencv
+    - insightface
+    default: insightface
+  talking_head:
+    available:
+    - wav2lip
+    - sadtalker
+    - opencv
+    default: wav2lip
+processing:
+  default_fps: 25
+  default_quality: high
+  gpu_enabled: true
+  max_workers: 4
+system:
+  allowed_formats:
+    audio:
+    - .wav
+    - .mp3
+    - .aac
+    - .flac
+    image:
+    - .jpg
+    - .jpeg
+    - .png
+    - .bmp
+    - .tiff
+    video:
+    - .mp4
+    - .avi
+    - .mov
+    - .mkv
+    - .webm
+  max_file_size_mb: 100
+  storage:
+    artifacts: storage/artifacts
+    cache: storage/cache
+    outputs: storage/outputs
+    uploads: storage/uploads

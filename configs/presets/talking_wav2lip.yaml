@@ -1,0 +1,15 @@
+job_type: talking_head
+params:
+  method: "wav2lip"
+  enhancer: "gfpgan"
+  frame_rate: 25
+  quality: "high"
+  post_processing:
+    stabilize: true
+    sharpen: 0.5
+    grain: 0.1
+  audio:
+    normalize: true
+    remove_noise: true
+consent_tag: demo
+description: "Wav2Lip ile konuşan kafa - profesyonel kalite"

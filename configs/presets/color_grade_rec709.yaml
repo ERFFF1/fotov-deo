@@ -1,0 +1,16 @@
+job_type: color_grade
+params:
+  lut: "rec709.cube"
+  saturation: 1.05
+  contrast: 1.02
+  brightness: 0.0
+  gamma: 1.0
+  white_balance:
+    temperature: 0
+    tint: 0
+  tone_mapping: "filmic"
+  output_format: "mp4"
+  codec: "h264"
+  crf: 18
+consent_tag: demo
+description: "Rec709 renk düzeltme - sinema kalitesi"

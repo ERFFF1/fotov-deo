@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Studio - Gelişmiş Akıllı Sihirbaz</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .wizard-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .wizard-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .wizard-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .wizard-subtitle {
+            opacity: 0.9;
+        }
+        
+        .wizard-steps {
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+            background: #f8f9fa;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 1rem;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-number {
+            background: #667eea;
+            color: white;
+        }
+        
+        .step.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+        
+        .step-label {
+            font-weight: 500;
+            color: #6c757d;
+        }
+        
+        .step.active .step-label {
+            color: #667eea;
+        }
+        
+        .step.completed .step-label {
+            color: #28a745;
+        }
+        
+        .wizard-content {
+            padding: 2rem;
+        }
+        
+        .step-content {
+            display: none;
+        }
+        
+        .step-content.active {
+            display: block;
+        }
+        
+        .upload-zone {
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        .upload-zone:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+        
+        .upload-zone.dragover {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-text {
+            font-size: 1.1rem;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-hint {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .file-preview {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #e8f5e8;
+            border-radius: 8px;
+            border: 1px solid #c3e6c3;
+        }
+        
+        .file-preview.show {
+            display: block;
+        }
+        
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .file-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: #155724;
+        }
+        
+        .file-size {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .job-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .job-type-card {
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: white;
+        }
+        
+        .job-type-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .job-type-card.selected {
+            border-color: #28a745;
+            background: #f8fff8;
+        }
+        
+        .job-type-card.selected::before {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #28a745;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .job-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .job-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .job-description {
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+        
+        .smart-recommendation {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #fff3cd;
+            border-radius: 8px;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .recommendation-badge {
+            display: inline-block;
+            background: #f39c12;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .recommendation-details {
+            text-align: left;
+            font-size: 0.9rem;
+            color: #856404;
+        }
+        
+        .recommendation-details strong {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .recommendation-details ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+        
+        .recommendation-details li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .parameter-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .parameter-section.show {
+            display: block;
+        }
+        
+        .parameter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .parameter-group {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .parameter-label {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .parameter-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .parameter-select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .parameter-checkbox {
+            margin-right: 0.5rem;
+        }
+        
+        .wizard-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .comparison-slider {
+            position: relative;
+            margin: 2rem 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .comparison-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+        }
+        
+        .comparison-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .comparison-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            border-right: 2px solid #fff;
+        }
+        
+        .comparison-slider-handle {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 4px;
+            height: 100%;
+            background: #fff;
+            cursor: ew-resize;
+            z-index: 10;
+        }
+        
+        .comparison-slider-handle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -8px;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .comparison-slider-handle::after {
+            content: '⟷';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .metrics-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .metric-chart {
+            width: 100%;
+            height: 100px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+        
+        .open-source-info {
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .open-source-title {
+            font-weight: bold;
+            color: #155724;
+            margin-bottom: 1rem;
+        }
+        
+        .open-source-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .open-source-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #c3e6c3;
+        }
+        
+        .open-source-name {
+            font-weight: 500;
+            color: #155724;
+            margin-bottom: 0.5rem;
+        }
+        
+        .open-source-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="wizard-container">
+        <div class="wizard-header">
+            <h1 class="wizard-title">🚀 Gelişmiş Akıllı Sihirbaz</h1>
+            <p class="wizard-subtitle">AI destekli fotoğraf ve video işleme için rehberli süreç</p>
+        </div>
+        
+        <div class="wizard-steps">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-label">Dosya Yükle</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-label">İş Türü Seç</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-label">Parametreler</div>
+            </div>
+            <div class="step" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-label">Önizleme</div>
+            </div>
+        </div>
+        
+        <div class="wizard-content">
+            <!-- Step 1: File Upload -->
+            <div class="step-content active" data-step="1">
+                <h2>📁 Dosya Yükleme</h2>
+                <p>İşlemek istediğiniz dosyayı yükleyin</p>
+                
+                <div class="upload-zone" id="upload-zone">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Dosyayı sürükleyip bırakın veya tıklayarak seçin</div>
+                    <div class="upload-hint">Desteklenen formatlar: JPG, PNG, MP4, MOV, AVI</div>
+                    <input type="file" id="file-input" accept="image/*,video/*" style="display: none;">
+                </div>
+                
+                <div class="file-preview" id="file-preview">
+                    <img class="preview-image" id="preview-image" src="" alt="Önizleme">
+                    <div class="file-info">
+                        <span class="file-name" id="file-name"></span>
+                        <span class="file-size" id="file-size"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 2: Job Type Selection -->
+            <div class="step-content" data-step="2">
+                <h2>🎯 İş Türü Seçimi</h2>
+                <p>Hangi AI işlemini yapmak istiyorsunuz?</p>
+                
+                <div class="job-type-grid">
+                    <div class="job-type-card" data-type="face_swap">
+                        <div class="job-icon">🎭</div>
+                        <h3 class="job-title">Face Swap</h3>
+                        <p class="job-description">Yüz değiştirme</p>
+                        <div class="smart-recommendation">
+                            <span class="recommendation-badge">💡 Profesyonel Kalite için Önerilir</span>
+                            <div class="recommendation-details">
+                                <strong>Önerilen Ayarlar:</strong>
+                                <ul>
+                                    <li>Detector: InsightFace</li>
+                                    <li>Swapper: inswapper_128.onnx</li>
+                                    <li>Quality: High</li>
+                                    <li>Color Correction: Enabled</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-type-card" data-type="talking_head">
+                        <div class="job-icon">🗣️</div>
+                        <h3 class="job-title">Talking Head</h3>
+                        <p class="job-description">Konuşan kafa</p>
+                        <div class="smart-recommendation">
+                            <span class="recommendation-badge">🎬 Sinematik Kalite</span>
+                            <div class="recommendation-details">
+                                <strong>Önerilen Ayarlar:</strong>
+                                <ul>
+                                    <li>Model: SadTalker</li>
+                                    <li>Resolution: 512x512</li>
+                                    <li>Post-process: Enabled</li>
+                                    <li>Audio Sync: High</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-type-card" data-type="face_enhance">
+                        <div class="job-icon">✨</div>
+                        <h3 class="job-title">Face Enhance</h3>
+                        <p class="job-description">Yüz iyileştirme</p>
+                        <div class="smart-recommendation">
+                            <span class="recommendation-badge">✨ Premium Kalite</span>
+                            <div class="recommendation-details">
+                                <strong>Önerilen Ayarlar:</strong>
+                                <ul>
+                                    <li>Model: GFPGAN</li>
+                                    <li>Upscale: 2x</li>
+                                    <li>Quality: Ultra</li>
+                                    <li>Face Restoration: Enabled</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="job-type-card" data-type="video_process">
+                        <div class="job-icon">🎬</div>
+                        <h3 class="job-title">Video Process</h3>
+                        <p class="job-description">Video işleme</p>
+                        <div class="smart-recommendation">
+                            <span class="recommendation-badge">🎥 Profesyonel</span>
+                            <div class="recommendation-details">
+                                <strong>Önerilen Ayarlar:</strong>
+                                <ul>
+                                    <li>Stabilization: Enabled</li>
+                                    <li>Color Grade: Rec709</li>
+                                    <li>Audio: Normalized</li>
+                                    <li>Output: MP4</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: Parameters -->
+            <div class="step-content" data-step="3">
+                <h2>⚙️ Parametreler</h2>
+                <p>Seçilen iş türüne göre parametreleri ayarlayın</p>
+                
+                <div class="parameter-section" id="parameter-section">
+                    <div class="parameter-grid" id="parameter-grid">
+                        <!-- Dinamik olarak doldurulacak -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 4: Preview -->
+            <div class="step-content" data-step="4">
+                <h2>👁️ Önizleme ve Onay</h2>
+                <p>Ayarlarınızı kontrol edin ve işlemi başlatın</p>
+                
+                <div class="comparison-slider" id="comparison-slider" style="display: none;">
+                    <div class="comparison-container">
+                        <img class="comparison-image" id="original-image" src="" alt="Orijinal">
+                        <div class="comparison-overlay">
+                            <img class="comparison-image" id="processed-image" src="" alt="İşlenmiş">
+                        </div>
+                        <div class="comparison-slider-handle"></div>
+                    </div>
+                </div>
+                
+                <div class="metrics-display" id="metrics-display" style="display: none;">
+                    <div class="metric-card">
+                        <div class="metric-value" id="quality-score">95%</div>
+                        <div class="metric-label">Kalite Skoru</div>
+                        <div class="metric-chart" id="quality-chart"></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="processing-time">2.3s</div>
+                        <div class="metric-label">İşlem Süresi</div>
+                        <div class="metric-chart" id="time-chart"></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="file-size">1.2MB</div>
+                        <div class="metric-label">Çıktı Boyutu</div>
+                        <div class="metric-chart" id="size-chart"></div>
+                    </div>
+                </div>
+                
+                <div class="open-source-info">
+                    <div class="open-source-title">🔓 Kullanılan Açık Kaynak Modeller</div>
+                    <div class="open-source-list">
+                        <div class="open-source-item">
+                            <div class="open-source-name">GFPGAN</div>
+                            <div class="open-source-description">Yüz iyileştirme ve restorasyon</div>
+                        </div>
+                        <div class="open-source-item">
+                            <div class="open-source-name">SadTalker</div>
+                            <div class="open-source-description">Konuşan kafa üretimi</div>
+                        </div>
+                        <div class="open-source-item">
+                            <div class="open-source-name">InsightFace</div>
+                            <div class="open-source-description">Yüz tanıma ve değiştirme</div>
+                        </div>
+                        <div class="open-source-item">
+                            <div class="open-source-name">OpenCV</div>
+                            <div class="open-source-description">Computer vision işlemleri</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="wizard-actions">
+            <button class="btn btn-secondary" id="prev-btn" disabled>Geri</button>
+            <button class="btn btn-primary" id="next-btn">İleri</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedJobType = null;
+        let uploadedFile = null;
+        
+        // Step navigation
+        document.getElementById('next-btn').addEventListener('click', nextStep);
+        document.getElementById('prev-btn').addEventListener('click', prevStep);
+        
+        function nextStep() {
+            if (currentStep < 4) {
+                currentStep++;
+                updateStepDisplay();
+                updateParameters();
+            }
+        }
+        
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepDisplay();
+            }
+        }
+        
+        function updateStepDisplay() {
+            // Update step indicators
+            document.querySelectorAll('.step').forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                } else if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                }
+            });
+            
+            // Update step content
+            document.querySelectorAll('.step-content').forEach((content, index) => {
+                content.classList.remove('active');
+                if (index + 1 === currentStep) {
+                    content.classList.add('active');
+                }
+            });
+            
+            // Update buttons
+            document.getElementById('prev-btn').disabled = currentStep === 1;
+            document.getElementById('next-btn').textContent = currentStep === 4 ? 'İşlemi Başlat' : 'İleri';
+        }
+        
+        // File upload
+        const uploadZone = document.getElementById('upload-zone');
+        const fileInput = document.getElementById('file-input');
+        const filePreview = document.getElementById('file-preview');
+        
+        uploadZone.addEventListener('click', () => fileInput.click());
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        function handleFile(file) {
+            uploadedFile = file;
+            
+            // Show file preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('preview-image').src = e.target.result;
+                document.getElementById('file-name').textContent = file.name;
+                document.getElementById('file-size').textContent = formatFileSize(file.size);
+                filePreview.classList.add('show');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Job type selection
+        document.querySelectorAll('.job-type-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.job-type-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedJobType = card.dataset.type;
+            });
+        });
+        
+        // Parameter generation
+        function updateParameters() {
+            if (currentStep === 3 && selectedJobType) {
+                const parameterSection = document.getElementById('parameter-section');
+                const parameterGrid = document.getElementById('parameter-grid');
+                
+                parameterSection.classList.add('show');
+                
+                const parameters = getParametersForJobType(selectedJobType);
+                parameterGrid.innerHTML = '';
+                
+                parameters.forEach(param => {
+                    const paramGroup = document.createElement('div');
+                    paramGroup.className = 'parameter-group';
+                    
+                    let inputHtml = '';
+                    if (param.type === 'select') {
+                        inputHtml = `
+                            <select class="parameter-select" name="${param.name}">
+                                ${param.options.map(option => 
+                                    `<option value="${option.value}" ${option.selected ? 'selected' : ''}>${option.label}</option>`
+                                ).join('')}
+                            </select>
+                        `;
+                    } else if (param.type === 'checkbox') {
+                        inputHtml = `
+                            <label>
+                                <input type="checkbox" class="parameter-checkbox" name="${param.name}" ${param.default ? 'checked' : ''}>
+                                ${param.label}
+                            </label>
+                        `;
+                    } else {
+                        inputHtml = `
+                            <input type="${param.type}" class="parameter-input" name="${param.name}" 
+                                   value="${param.default || ''}" placeholder="${param.placeholder || ''}">
+                        `;
+                    }
+                    
+                    paramGroup.innerHTML = `
+                        <label class="parameter-label">${param.label}</label>
+                        ${inputHtml}
+                    `;
+                    
+                    parameterGrid.appendChild(paramGroup);
+                });
+            }
+        }
+        
+        function getParametersForJobType(jobType) {
+            const parameters = {
+                'face_swap': [
+                    { name: 'detector', label: 'Yüz Tespit Yöntemi', type: 'select', options: [
+                        { value: 'insightface', label: 'InsightFace (Önerilen)', selected: true },
+                        { value: 'opencv', label: 'OpenCV' },
+                        { value: 'mediapipe', label: 'MediaPipe' }
+                    ]},
+                    { name: 'swapper', label: 'Yüz Değiştirme Modeli', type: 'select', options: [
+                        { value: 'inswapper_128.onnx', label: 'InSwapper 128 (Önerilen)', selected: true },
+                        { value: 'inswapper_256.onnx', label: 'InSwapper 256' }
+                    ]},
+                    { name: 'quality', label: 'Kalite', type: 'select', options: [
+                        { value: 'high', label: 'Yüksek (Önerilen)', selected: true },
+                        { value: 'medium', label: 'Orta' },
+                        { value: 'low', label: 'Düşük' }
+                    ]},
+                    { name: 'color_correction', label: 'Renk Düzeltme', type: 'checkbox', default: true }
+                ],
+                'talking_head': [
+                    { name: 'model', label: 'Model', type: 'select', options: [
+                        { value: 'sadtalker', label: 'SadTalker (Önerilen)', selected: true },
+                        { value: 'wav2lip', label: 'Wav2Lip' }
+                    ]},
+                    { name: 'resolution', label: 'Çözünürlük', type: 'select', options: [
+                        { value: '512x512', label: '512x512 (Önerilen)', selected: true },
+                        { value: '256x256', label: '256x256' },
+                        { value: '1024x1024', label: '1024x1024' }
+                    ]},
+                    { name: 'post_process', label: 'Post-Process', type: 'checkbox', default: true },
+                    { name: 'audio_sync', label: 'Ses Senkronizasyonu', type: 'select', options: [
+                        { value: 'high', label: 'Yüksek (Önerilen)', selected: true },
+                        { value: 'medium', label: 'Orta' },
+                        { value: 'low', label: 'Düşük' }
+                    ]}
+                ],
+                'face_enhance': [
+                    { name: 'model', label: 'Model', type: 'select', options: [
+                        { value: 'gfpgan', label: 'GFPGAN (Önerilen)', selected: true },
+                        { value: 'realesrgan', label: 'Real-ESRGAN' },
+                        { value: 'opencv', label: 'OpenCV' }
+                    ]},
+                    { name: 'upscale', label: 'Büyütme Oranı', type: 'select', options: [
+                        { value: '2x', label: '2x (Önerilen)', selected: true },
+                        { value: '4x', label: '4x' },
+                        { value: '8x', label: '8x' }
+                    ]},
+                    { name: 'quality', label: 'Kalite', type: 'select', options: [
+                        { value: 'ultra', label: 'Ultra (Önerilen)', selected: true },
+                        { value: 'high', label: 'Yüksek' },
+                        { value: 'medium', label: 'Orta' }
+                    ]},
+                    { name: 'face_restoration', label: 'Yüz Restorasyonu', type: 'checkbox', default: true }
+                ],
+                'video_process': [
+                    { name: 'stabilization', label: 'Stabilizasyon', type: 'checkbox', default: true },
+                    { name: 'color_grade', label: 'Renk Düzeltme', type: 'select', options: [
+                        { value: 'rec709', label: 'Rec709 (Önerilen)', selected: true },
+                        { value: 'rec2020', label: 'Rec2020' },
+                        { value: 'none', label: 'Yok' }
+                    ]},
+                    { name: 'audio_normalize', label: 'Ses Normalizasyonu', type: 'checkbox', default: true },
+                    { name: 'output_format', label: 'Çıktı Formatı', type: 'select', options: [
+                        { value: 'mp4', label: 'MP4 (Önerilen)', selected: true },
+                        { value: 'avi', label: 'AVI' },
+                        { value: 'mov', label: 'MOV' }
+                    ]}
+                ]
+            };
+            
+            return parameters[jobType] || [];
+        }
+        
+        // Comparison slider
+        function initComparisonSlider() {
+            const slider = document.getElementById('comparison-slider');
+            const handle = document.querySelector('.comparison-slider-handle');
+            const overlay = document.querySelector('.comparison-overlay');
+            
+            if (!slider || !handle || !overlay) return;
+            
+            let isDragging = false;
+            
+            handle.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const rect = slider.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+                
+                handle.style.left = percentage + '%';
+                overlay.style.width = percentage + '%';
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initComparisonSlider();
+        });
+    </script>
+</body>
+</html>

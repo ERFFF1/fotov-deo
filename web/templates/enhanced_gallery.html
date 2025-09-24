@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Studio - Gelişmiş Galeri</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .gallery-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+        
+        .gallery-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .gallery-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .gallery-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 1px solid #dee2e6;
+            border-radius: 25px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #dee2e6;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .view-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .view-btn {
+            padding: 0.5rem;
+            border: 1px solid #dee2e6;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .view-btn:hover,
+        .view-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .gallery-grid.grid-view {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+        
+        .gallery-grid.list-view {
+            grid-template-columns: 1fr;
+        }
+        
+        .gallery-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .gallery-item.grid-view {
+            /* Grid view styles */
+        }
+        
+        .gallery-item.list-view {
+            display: flex;
+            align-items: center;
+        }
+        
+        .gallery-thumbnail {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f8f9fa;
+        }
+        
+        .gallery-item.list-view .gallery-thumbnail {
+            width: 150px;
+            height: 100px;
+            flex-shrink: 0;
+        }
+        
+        .gallery-content {
+            padding: 1.5rem;
+        }
+        
+        .gallery-item.list-view .gallery-content {
+            flex: 1;
+        }
+        
+        .gallery-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .gallery-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .gallery-description {
+            color: #6c757d;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .gallery-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .btn-primary-action {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary-action:hover {
+            background: #5a6fd8;
+        }
+        
+        .btn-secondary-action {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary-action:hover {
+            background: #5a6268;
+        }
+        
+        .btn-outline-action {
+            background: transparent;
+            color: #667eea;
+            border: 1px solid #667eea;
+        }
+        
+        .btn-outline-action:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .comparison-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .comparison-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .comparison-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .comparison-modal.show .comparison-content {
+            transform: scale(1);
+        }
+        
+        .comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .comparison-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .comparison-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+            transition: color 0.3s ease;
+        }
+        
+        .comparison-close:hover {
+            color: #dc3545;
+        }
+        
+        .comparison-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .comparison-image {
+            text-align: center;
+        }
+        
+        .comparison-image img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .comparison-label {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        
+        .comparison-slider {
+            position: relative;
+            margin: 2rem 0;
+        }
+        
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        
+        .slider-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        
+        .slider-handle {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 4px;
+            height: 100%;
+            background: #667eea;
+            cursor: ew-resize;
+            transform: translateX(-50%);
+        }
+        
+        .slider-handle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border: 3px solid white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .comparison-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6c757d;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        
+        .empty-description {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+        }
+        
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #dee2e6;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-btn:hover,
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-magic"></i>
+                Face/Video AI Studio
+            </div>
+            <nav class="nav">
+                <a href="/"><i class="fas fa-home"></i> Ana Sayfa</a>
+                <a href="/gallery" class="active"><i class="fas fa-images"></i> Galeri</a>
+                <a href="/api/docs"><i class="fas fa-code"></i> API</a>
+                <a href="/settings"><i class="fas fa-cog"></i> Ayarlar</a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="gallery-header">
+        <div class="container">
+            <h1 class="gallery-title">🖼️ Gelişmiş Galeri</h1>
+            <p class="gallery-subtitle">
+                Tüm AI işlemlerinizin sonuçlarını keşfedin, karşılaştırın ve yönetin
+            </p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalItems">0</div>
+                <div class="stat-label">Toplam İşlem</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedItems">0</div>
+                <div class="stat-label">Tamamlanan</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalSize">0</div>
+                <div class="stat-label">Toplam Boyut</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgQuality">0</div>
+                <div class="stat-label">Ortalama Kalite</div>
+            </div>
+        </div>
+
+        <!-- Gallery Controls -->
+        <div class="gallery-controls">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Galeride ara..." id="searchInput">
+            </div>
+            
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">Tümü</button>
+                <button class="filter-btn" data-filter="face_swap">Yüz Değiştirme</button>
+                <button class="filter-btn" data-filter="talking_head">Konuşan Kafa</button>
+                <button class="filter-btn" data-filter="color_grade">Renk Düzeltme</button>
+                <button class="filter-btn" data-filter="ai_generation">AI Üretimi</button>
+            </div>
+            
+            <div class="view-controls">
+                <button class="view-btn active" data-view="grid" title="Grid Görünümü">
+                    <i class="fas fa-th"></i>
+                </button>
+                <button class="view-btn" data-view="list" title="Liste Görünümü">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div class="gallery-grid grid-view" id="galleryGrid">
+            <!-- Gallery items will be populated here -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-icon">
+                <i class="fas fa-images"></i>
+            </div>
+            <h3 class="empty-title">Galeri Boş</h3>
+            <p class="empty-description">
+                Henüz hiç işlem yapılmamış. İlk AI işleminizi başlatmak için 
+                <a href="/new" style="color: #667eea;">yeni proje oluşturun</a>.
+            </p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination" style="display: none;">
+            <button class="page-btn" id="prevPage" disabled>
+                <i class="fas fa-chevron-left"></i> Önceki
+            </button>
+            <div id="pageNumbers"></div>
+            <button class="page-btn" id="nextPage">
+                Sonraki <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Comparison Modal -->
+    <div class="comparison-modal" id="comparisonModal">
+        <div class="comparison-content">
+            <div class="comparison-header">
+                <h3 class="comparison-title">Öncesi vs Sonrası Karşılaştırması</h3>
+                <button class="comparison-close" onclick="closeComparison()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="comparison-images" id="comparisonImages">
+                <!-- Comparison images will be populated here -->
+            </div>
+            
+            <div class="comparison-slider" id="comparisonSlider" style="display: none;">
+                <div class="slider-container">
+                    <img src="" alt="Original" class="slider-image" id="sliderOriginal">
+                    <img src="" alt="Processed" class="slider-image" id="sliderProcessed">
+                    <div class="slider-handle" id="sliderHandle"></div>
+                </div>
+            </div>
+            
+            <div class="comparison-actions">
+                <button class="action-btn btn-primary-action" onclick="downloadResult()">
+                    <i class="fas fa-download"></i> Sonucu İndir
+                </button>
+                <button class="action-btn btn-secondary-action" onclick="downloadConfig()">
+                    <i class="fas fa-cog"></i> Ayarları İndir
+                </button>
+                <button class="action-btn btn-outline-action" onclick="cloneJob()">
+                    <i class="fas fa-copy"></i> İşlemi Tekrarla
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        // Enhanced Gallery JavaScript
+        class EnhancedGallery {
+            constructor() {
+                this.currentView = 'grid';
+                this.currentFilter = 'all';
+                this.currentPage = 1;
+                this.itemsPerPage = 12;
+                this.allItems = [];
+                this.filteredItems = [];
+                this.currentComparisonItem = null;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadGalleryItems();
+                this.setupComparisonSlider();
+            }
+
+            setupEventListeners() {
+                // Search
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    this.filterItems();
+                });
+
+                // Filter buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.currentFilter = e.target.dataset.filter;
+                        this.filterItems();
+                    });
+                });
+
+                // View controls
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.currentView = e.target.dataset.view;
+                        this.updateView();
+                    });
+                });
+
+                // Pagination
+                document.getElementById('prevPage').addEventListener('click', () => {
+                    if (this.currentPage > 1) {
+                        this.currentPage--;
+                        this.renderItems();
+                    }
+                });
+
+                document.getElementById('nextPage').addEventListener('click', () => {
+                    const totalPages = Math.ceil(this.filteredItems.length / this.itemsPerPage);
+                    if (this.currentPage < totalPages) {
+                        this.currentPage++;
+                        this.renderItems();
+                    }
+                });
+
+                // Modal close
+                document.getElementById('comparisonModal').addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) {
+                        this.closeComparison();
+                    }
+                });
+            }
+
+            async loadGalleryItems() {
+                try {
+                    const response = await fetch('/api/jobs?limit=100&status=completed');
+                    const data = await response.json();
+                    this.allItems = data.jobs || [];
+                    this.filterItems();
+                    this.updateStats();
+                } catch (error) {
+                    console.error('Galeri yükleme hatası:', error);
+                    this.showEmptyState();
+                }
+            }
+
+            filterItems() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                
+                this.filteredItems = this.allItems.filter(item => {
+                    // Filter by type
+                    if (this.currentFilter !== 'all' && item.job_type !== this.currentFilter) {
+                        return false;
+                    }
+                    
+                    // Filter by search term
+                    if (searchTerm && !item.job_type.toLowerCase().includes(searchTerm)) {
+                        return false;
+                    }
+                    
+                    return true;
+                });
+                
+                this.currentPage = 1;
+                this.renderItems();
+            }
+
+            renderItems() {
+                const container = document.getElementById('galleryGrid');
+                const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+                const endIndex = startIndex + this.itemsPerPage;
+                const pageItems = this.filteredItems.slice(startIndex, endIndex);
+                
+                if (pageItems.length === 0) {
+                    this.showEmptyState();
+                    return;
+                }
+                
+                this.hideEmptyState();
+                
+                container.innerHTML = pageItems.map(item => this.createGalleryItem(item)).join('');
+                this.updatePagination();
+            }
+
+            createGalleryItem(item) {
+                const viewClass = this.currentView === 'list' ? 'list-view' : 'grid-view';
+                const thumbnail = this.getThumbnail(item);
+                const icon = this.getJobIcon(item.job_type);
+                const title = this.getJobTitle(item.job_type);
+                const date = new Date(item.created_at).toLocaleDateString('tr-TR');
+                
+                return `
+                    <div class="gallery-item ${viewClass}" onclick="gallery.showComparison(${item.id})">
+                        <img src="${thumbnail}" alt="${title}" class="gallery-thumbnail">
+                        <div class="gallery-content">
+                            <h3 class="gallery-title">${title}</h3>
+                            <div class="gallery-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    ${date}
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    ${this.formatDuration(item.duration || 0)}
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-tag"></i>
+                                    ${item.consent_tag || 'unknown'}
+                                </div>
+                            </div>
+                            <div class="gallery-description">
+                                ${this.getJobDescription(item.job_type)}
+                            </div>
+                            <div class="gallery-actions">
+                                <button class="action-btn btn-primary-action" onclick="event.stopPropagation(); gallery.downloadResult(${item.id})">
+                                    <i class="fas fa-download"></i> İndir
+                                </button>
+                                <button class="action-btn btn-outline-action" onclick="event.stopPropagation(); gallery.cloneJob(${item.id})">
+                                    <i class="fas fa-copy"></i> Tekrarla
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getThumbnail(item) {
+                // Gerçek uygulamada item.output_path'den thumbnail oluşturulacak
+                return '/static/images/placeholder.jpg';
+            }
+
+            getJobIcon(jobType) {
+                const icons = {
+                    'face_swap': '🔄',
+                    'talking_head': '🗣️',
+                    'color_grade': '🎨',
+                    'bg_replace': '🖼️',
+                    'controlnet_generation': '✨',
+                    'video_post_production': '🎬'
+                };
+                return icons[jobType] || '⚙️';
+            }
+
+            getJobTitle(jobType) {
+                const titles = {
+                    'face_swap': 'Yüz Değiştirme',
+                    'talking_head': 'Konuşan Kafa',
+                    'color_grade': 'Renk Düzeltme',
+                    'bg_replace': 'Arka Plan Değiştirme',
+                    'controlnet_generation': 'AI Görüntü Üretimi',
+                    'video_post_production': 'Video Post-Prodüksiyon'
+                };
+                return titles[jobType] || jobType;
+            }
+
+            getJobDescription(jobType) {
+                const descriptions = {
+                    'face_swap': 'Profesyonel yüz değiştirme işlemi',
+                    'talking_head': 'Statik fotoğraftan konuşan kafa',
+                    'color_grade': 'Renk düzeltme ve iyileştirme',
+                    'bg_replace': 'AI destekli arka plan değiştirme',
+                    'controlnet_generation': 'Kontrollü AI görüntü üretimi',
+                    'video_post_production': 'Video post-prodüksiyon işlemi'
+                };
+                return descriptions[jobType] || 'AI işlemi';
+            }
+
+            formatDuration(seconds) {
+                if (seconds < 60) return `${seconds}s`;
+                const minutes = Math.floor(seconds / 60);
+                if (minutes < 60) return `${minutes}m`;
+                const hours = Math.floor(minutes / 60);
+                return `${hours}h ${minutes % 60}m`;
+            }
+
+            updateView() {
+                const container = document.getElementById('galleryGrid');
+                container.className = `gallery-grid ${this.currentView}-view`;
+                this.renderItems();
+            }
+
+            updatePagination() {
+                const totalPages = Math.ceil(this.filteredItems.length / this.itemsPerPage);
+                const pagination = document.getElementById('pagination');
+                
+                if (totalPages <= 1) {
+                    pagination.style.display = 'none';
+                    return;
+                }
+                
+                pagination.style.display = 'flex';
+                
+                const prevBtn = document.getElementById('prevPage');
+                const nextBtn = document.getElementById('nextPage');
+                const pageNumbers = document.getElementById('pageNumbers');
+                
+                prevBtn.disabled = this.currentPage === 1;
+                nextBtn.disabled = this.currentPage === totalPages;
+                
+                // Page numbers
+                let pageHtml = '';
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === 1 || i === totalPages || (i >= this.currentPage - 2 && i <= this.currentPage + 2)) {
+                        pageHtml += `
+                            <button class="page-btn ${i === this.currentPage ? 'active' : ''}" 
+                                    onclick="gallery.goToPage(${i})">
+                                ${i}
+                            </button>
+                        `;
+                    } else if (i === this.currentPage - 3 || i === this.currentPage + 3) {
+                        pageHtml += '<span>...</span>';
+                    }
+                }
+                
+                pageNumbers.innerHTML = pageHtml;
+            }
+
+            goToPage(page) {
+                this.currentPage = page;
+                this.renderItems();
+            }
+
+            showEmptyState() {
+                document.getElementById('galleryGrid').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('pagination').style.display = 'none';
+            }
+
+            hideEmptyState() {
+                document.getElementById('galleryGrid').style.display = 'grid';
+                document.getElementById('emptyState').style.display = 'none';
+            }
+
+            updateStats() {
+                document.getElementById('totalItems').textContent = this.allItems.length;
+                document.getElementById('completedItems').textContent = this.allItems.length;
+                
+                // Calculate total size (mock data)
+                const totalSize = this.allItems.length * 5.2; // MB
+                document.getElementById('totalSize').textContent = totalSize.toFixed(1) + ' MB';
+                
+                // Calculate average quality (mock data)
+                const avgQuality = 8.5;
+                document.getElementById('avgQuality').textContent = avgQuality.toFixed(1) + '/10';
+            }
+
+            showComparison(itemId) {
+                const item = this.allItems.find(i => i.id === itemId);
+                if (!item) return;
+                
+                this.currentComparisonItem = item;
+                const modal = document.getElementById('comparisonModal');
+                const images = document.getElementById('comparisonImages');
+                
+                // Show comparison images
+                images.innerHTML = `
+                    <div class="comparison-image">
+                        <div class="comparison-label">Orijinal</div>
+                        <img src="/static/images/original.jpg" alt="Original">
+                    </div>
+                    <div class="comparison-image">
+                        <div class="comparison-label">İşlenmiş</div>
+                        <img src="/static/images/processed.jpg" alt="Processed">
+                    </div>
+                `;
+                
+                modal.classList.add('show');
+            }
+
+            closeComparison() {
+                document.getElementById('comparisonModal').classList.remove('show');
+                this.currentComparisonItem = null;
+            }
+
+            setupComparisonSlider() {
+                // Slider functionality would be implemented here
+                // For now, just show the comparison images
+            }
+
+            downloadResult(itemId) {
+                const item = this.allItems.find(i => i.id === itemId);
+                if (item && item.output_path) {
+                    window.open(`/api/jobs/${itemId}/result`, '_blank');
+                }
+            }
+
+            downloadConfig(itemId) {
+                const item = this.allItems.find(i => i.id === itemId);
+                if (item) {
+                    // Download job configuration as YAML
+                    const config = {
+                        job_type: item.job_type,
+                        created_at: item.created_at,
+                        parameters: item.metrics_json || {}
+                    };
+                    
+                    const blob = new Blob([JSON.stringify(config, null, 2)], {type: 'application/json'});
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `job_${itemId}_config.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+            }
+
+            cloneJob(itemId) {
+                const item = this.allItems.find(i => i.id === itemId);
+                if (item) {
+                    // Redirect to new project with same type
+                    window.location.href = `/new?type=${item.job_type}&clone=${itemId}`;
+                }
+            }
+        }
+
+        // Global gallery instance
+        let gallery;
+
+        // Global functions
+        function closeComparison() {
+            gallery.closeComparison();
+        }
+
+        function downloadResult() {
+            if (gallery.currentComparisonItem) {
+                gallery.downloadResult(gallery.currentComparisonItem.id);
+            }
+        }
+
+        function downloadConfig() {
+            if (gallery.currentComparisonItem) {
+                gallery.downloadConfig(gallery.currentComparisonItem.id);
+            }
+        }
+
+        function cloneJob() {
+            if (gallery.currentComparisonItem) {
+                gallery.cloneJob(gallery.currentComparisonItem.id);
+            }
+        }
+
+        // Initialize gallery
+        document.addEventListener('DOMContentLoaded', () => {
+            gallery = new EnhancedGallery();
+        });
+    </script>
+</body>
+</html>

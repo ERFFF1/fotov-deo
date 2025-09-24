@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Studio - Akıllı Sihirbaz</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .wizard-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .wizard-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .wizard-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .wizard-subtitle {
+            opacity: 0.9;
+        }
+        
+        .wizard-steps {
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+            background: #f8f9fa;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 1rem;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-number {
+            background: #667eea;
+            color: white;
+        }
+        
+        .step.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+        
+        .step-label {
+            font-weight: 500;
+            color: #6c757d;
+        }
+        
+        .step.active .step-label {
+            color: #667eea;
+        }
+        
+        .step.completed .step-label {
+            color: #28a745;
+        }
+        
+        .wizard-content {
+            padding: 2rem;
+        }
+        
+        .step-content {
+            display: none;
+        }
+        
+        .step-content.active {
+            display: block;
+        }
+        
+        .upload-zone {
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #fafafa;
+        }
+        
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: #667eea;
+            background: #f0f8ff;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-text {
+            font-size: 1.1rem;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-hint {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .file-preview {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .preview-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .preview-info {
+            flex: 1;
+        }
+        
+        .preview-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .preview-meta {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .preview-remove {
+            color: #dc3545;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+        
+        .preview-remove:hover {
+            background: #f8d7da;
+        }
+        
+        .config-form {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .form-control {
+            padding: 0.75rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .checkbox {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .consent-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .consent-warning.danger {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .preview-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .preview-title {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        
+        .preview-placeholder {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+        }
+        
+        .wizard-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .btn-wizard {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-wizard {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary-wizard:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary-wizard {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary-wizard:hover {
+            background: #5a6268;
+        }
+        
+        .btn-wizard:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="wizard-container">
+        <div class="wizard-header">
+            <h1 class="wizard-title" id="wizardTitle">Yüz Değiştirme Sihirbazı</h1>
+            <p class="wizard-subtitle" id="wizardSubtitle">Adım adım rehberle profesyonel sonuçlar elde edin</p>
+        </div>
+        
+        <div class="wizard-steps">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-label">Dosyaları Yükle</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-label">Ayarları Yap</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-label">Önizleme</div>
+            </div>
+            <div class="step" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-label">Başlat</div>
+            </div>
+        </div>
+        
+        <div class="wizard-content">
+            <!-- Step 1: File Upload -->
+            <div class="step-content active" id="step1">
+                <h3>📁 Dosyaları Yükleyin</h3>
+                <p>İşlem için gerekli dosyaları yükleyin. Dosyaları sürükleyip bırakabilir veya tıklayarak seçebilirsiniz.</p>
+                
+                <div class="config-form">
+                    <div class="form-group">
+                        <label class="form-label">Kaynak Yüz (Source Face)</label>
+                        <div class="upload-zone" data-input-type="source_face">
+                            <div class="upload-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="upload-text">Kaynak yüz fotoğrafını yükleyin</div>
+                            <div class="upload-hint">JPG, PNG formatları desteklenir (Max 10MB)</div>
+                            <input type="file" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Hedef Görüntü/Video (Target)</label>
+                        <div class="upload-zone" data-input-type="target_image">
+                            <div class="upload-icon">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="upload-text">Hedef görüntü veya videoyu yükleyin</div>
+                            <div class="upload-hint">JPG, PNG, MP4 formatları desteklenir (Max 100MB)</div>
+                            <input type="file" accept="image/*,video/*" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 2: Configuration -->
+            <div class="step-content" id="step2">
+                <h3>⚙️ Ayarları Yapın</h3>
+                <p>İşlem parametrelerini ayarlayın. Önerilen ayarlar en iyi sonuçlar için optimize edilmiştir.</p>
+                
+                <div class="config-form">
+                    <div class="form-group">
+                        <label class="form-label">Yöntem Seçimi</label>
+                        <select class="form-control form-select" name="method">
+                            <option value="insightface">InsightFace (Önerilen) - En yüksek kalite</option>
+                            <option value="opencv">OpenCV - Hızlı işleme</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" class="checkbox" name="color_correction" checked>
+                            <label class="form-label">Renk Düzeltme</label>
+                        </div>
+                        <small style="color: #6c757d;">Hedef görüntünün renklerine uyum sağlar</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" class="checkbox" name="enhance_quality" checked>
+                            <label class="form-label">Kalite İyileştirme</label>
+                        </div>
+                        <small style="color: #6c757d;">GFPGAN ile yüz kalitesini artırır</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Rıza Durumu *</label>
+                        <select class="form-control form-select" name="consent_tag" required>
+                            <option value="">Lütfen seçin...</option>
+                            <option value="consented">İzinli İçerik - Açık rıza alınmış</option>
+                            <option value="demo">Demo/Eğlence Amaçlı - Ticari kullanım yasak</option>
+                            <option value="unknown">Bilinmeyen - Yasal sorumluluk kullanıcıya aittir</option>
+                        </select>
+                        <div class="consent-warning" id="consentWarning" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Önemli:</strong> Rıza durumu yasal zorunluluktur. Lütfen doğru seçimi yapın.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: Preview -->
+            <div class="step-content" id="step3">
+                <h3>👁️ Önizleme</h3>
+                <p>Ayarlarınızın özetini kontrol edin ve işlemi başlatmadan önce son kontrolleri yapın.</p>
+                
+                <div class="preview-section">
+                    <div class="preview-title">İşlem Özeti</div>
+                    <div id="previewContent">
+                        <div class="preview-placeholder">
+                            <i class="fas fa-eye" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>Önizleme hazırlanıyor...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 4: Launch -->
+            <div class="step-content" id="step4">
+                <h3>🚀 İşlemi Başlat</h3>
+                <p>Her şey hazır! İşlemi başlatmak için aşağıdaki butona tıklayın.</p>
+                
+                <div class="preview-section">
+                    <div class="preview-title">Son Kontrol</div>
+                    <div id="finalSummary">
+                        <!-- Final summary will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="wizard-actions">
+            <button class="btn-wizard btn-secondary-wizard" id="prevBtn" onclick="changeStep(-1)" disabled>
+                <i class="fas fa-arrow-left"></i> Geri
+            </button>
+            <button class="btn-wizard btn-primary-wizard" id="nextBtn" onclick="changeStep(1)">
+                İleri <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>İşlem Başlatılıyor...</h3>
+            <p>Lütfen bekleyin, işleminiz kuyruğa ekleniyor.</p>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        // Smart Wizard JavaScript
+        class SmartWizard {
+            constructor() {
+                this.currentStep = 1;
+                this.totalSteps = 4;
+                this.jobType = this.getJobTypeFromURL();
+                this.uploadedFiles = new Map();
+                this.config = {};
+                this.init();
+            }
+
+            init() {
+                this.setupWizard();
+                this.setupFileUpload();
+                this.setupFormValidation();
+                this.updateWizardTitle();
+            }
+
+            getJobTypeFromURL() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('type') || 'face_swap';
+            }
+
+            setupWizard() {
+                // Wizard başlığını güncelle
+                this.updateWizardTitle();
+                
+                // İlk adımı göster
+                this.showStep(1);
+            }
+
+            updateWizardTitle() {
+                const titles = {
+                    'face_swap': 'Yüz Değiştirme Sihirbazı',
+                    'talking_head': 'Konuşan Kafa Sihirbazı',
+                    'color_grade': 'Renk Düzeltme Sihirbazı',
+                    'bg_replace': 'Arka Plan Değiştirme Sihirbazı',
+                    'controlnet_generation': 'AI Görüntü Üretimi Sihirbazı',
+                    'video_post_production': 'Video Post-Prodüksiyon Sihirbazı'
+                };
+
+                const subtitles = {
+                    'face_swap': 'Adım adım rehberle profesyonel sonuçlar elde edin',
+                    'talking_head': 'Statik fotoğrafı konuşan videoya dönüştürün',
+                    'color_grade': 'Görüntülerinizi profesyonel seviyede düzeltin',
+                    'bg_replace': 'AI ile arka plan değiştirme',
+                    'controlnet_generation': 'Metin açıklamasından görüntü üretin',
+                    'video_post_production': 'Videolarınızı profesyonel seviyede işleyin'
+                };
+
+                document.getElementById('wizardTitle').textContent = titles[this.jobType] || 'AI Studio Sihirbazı';
+                document.getElementById('wizardSubtitle').textContent = subtitles[this.jobType] || 'Adım adım rehberle işlem yapın';
+            }
+
+            setupFileUpload() {
+                const uploadZones = document.querySelectorAll('.upload-zone');
+                
+                uploadZones.forEach(zone => {
+                    const input = zone.querySelector('input[type="file"]');
+                    
+                    // Click to upload
+                    zone.addEventListener('click', () => {
+                        input.click();
+                    });
+                    
+                    // Drag and drop
+                    zone.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        zone.classList.add('dragover');
+                    });
+                    
+                    zone.addEventListener('dragleave', (e) => {
+                        e.preventDefault();
+                        zone.classList.remove('dragover');
+                    });
+                    
+                    zone.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        zone.classList.remove('dragover');
+                        
+                        const files = Array.from(e.dataTransfer.files);
+                        if (files.length > 0) {
+                            this.handleFileUpload(files[0], zone);
+                        }
+                    });
+                    
+                    // File input change
+                    input.addEventListener('change', (e) => {
+                        if (e.target.files.length > 0) {
+                            this.handleFileUpload(e.target.files[0], zone);
+                        }
+                    });
+                });
+            }
+
+            async handleFileUpload(file, zone) {
+                const inputType = zone.dataset.inputType;
+                
+                // File validation
+                if (!this.validateFile(file, inputType)) {
+                    return;
+                }
+                
+                // Show loading
+                this.showFilePreview(file, zone, 'uploading');
+                
+                try {
+                    // Upload file
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    
+                    const response = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.uploadedFiles.set(inputType, result);
+                        this.showFilePreview(file, zone, 'success');
+                        this.updateStepValidation();
+                    } else {
+                        throw new Error(result.error || 'Upload failed');
+                    }
+                } catch (error) {
+                    this.showFilePreview(file, zone, 'error');
+                    alert('Dosya yükleme hatası: ' + error.message);
+                }
+            }
+
+            validateFile(file, inputType) {
+                const maxSizes = {
+                    'source_face': 10 * 1024 * 1024, // 10MB
+                    'target_image': 100 * 1024 * 1024 // 100MB
+                };
+                
+                const allowedTypes = {
+                    'source_face': ['image/jpeg', 'image/png', 'image/jpg'],
+                    'target_image': ['image/jpeg', 'image/png', 'image/jpg', 'video/mp4', 'video/avi', 'video/mov']
+                };
+                
+                if (file.size > maxSizes[inputType]) {
+                    alert(`Dosya çok büyük. Maksimum boyut: ${maxSizes[inputType] / (1024*1024)}MB`);
+                    return false;
+                }
+                
+                if (!allowedTypes[inputType].includes(file.type)) {
+                    alert('Desteklenmeyen dosya formatı');
+                    return false;
+                }
+                
+                return true;
+            }
+
+            showFilePreview(file, zone, status) {
+                const preview = document.createElement('div');
+                preview.className = 'file-preview';
+                
+                let statusIcon = '';
+                let statusText = '';
+                
+                switch (status) {
+                    case 'uploading':
+                        statusIcon = '<i class="fas fa-spinner fa-spin"></i>';
+                        statusText = 'Yükleniyor...';
+                        break;
+                    case 'success':
+                        statusIcon = '<i class="fas fa-check-circle" style="color: #28a745;"></i>';
+                        statusText = 'Yüklendi';
+                        break;
+                    case 'error':
+                        statusIcon = '<i class="fas fa-exclamation-circle" style="color: #dc3545;"></i>';
+                        statusText = 'Hata';
+                        break;
+                }
+                
+                const isImage = file.type.startsWith('image/');
+                const isVideo = file.type.startsWith('video/');
+                
+                preview.innerHTML = `
+                    ${isImage ? `<img src="${URL.createObjectURL(file)}" class="preview-image" alt="Preview">` : ''}
+                    ${isVideo ? `<video src="${URL.createObjectURL(file)}" class="preview-image" muted></video>` : ''}
+                    <div class="preview-info">
+                        <div class="preview-name">${file.name}</div>
+                        <div class="preview-meta">
+                            ${this.formatFileSize(file.size)} • ${statusText} ${statusIcon}
+                        </div>
+                    </div>
+                    <div class="preview-remove" onclick="this.parentElement.remove(); wizard.updateStepValidation();">
+                        <i class="fas fa-times"></i>
+                    </div>
+                `;
+                
+                // Remove existing preview
+                const existingPreview = zone.parentElement.querySelector('.file-preview');
+                if (existingPreview) {
+                    existingPreview.remove();
+                }
+                
+                // Hide upload zone
+                zone.style.display = 'none';
+                
+                // Add preview
+                zone.parentElement.appendChild(preview);
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            setupFormValidation() {
+                // Consent tag validation
+                const consentSelect = document.querySelector('select[name="consent_tag"]');
+                const consentWarning = document.getElementById('consentWarning');
+                
+                consentSelect.addEventListener('change', (e) => {
+                    if (e.target.value === '') {
+                        consentWarning.style.display = 'block';
+                        consentWarning.classList.add('danger');
+                    } else {
+                        consentWarning.style.display = 'none';
+                        consentWarning.classList.remove('danger');
+                    }
+                    this.updateStepValidation();
+                });
+            }
+
+            updateStepValidation() {
+                const nextBtn = document.getElementById('nextBtn');
+                
+                // Step 1 validation
+                if (this.currentStep === 1) {
+                    const requiredFiles = this.getRequiredFiles();
+                    const hasAllFiles = requiredFiles.every(fileType => this.uploadedFiles.has(fileType));
+                    nextBtn.disabled = !hasAllFiles;
+                }
+                
+                // Step 2 validation
+                if (this.currentStep === 2) {
+                    const consentTag = document.querySelector('select[name="consent_tag"]').value;
+                    nextBtn.disabled = !consentTag;
+                }
+            }
+
+            getRequiredFiles() {
+                const fileRequirements = {
+                    'face_swap': ['source_face', 'target_image'],
+                    'talking_head': ['image', 'audio'],
+                    'color_grade': ['input'],
+                    'bg_replace': ['image', 'background'],
+                    'controlnet_generation': ['control_image'],
+                    'video_post_production': ['video']
+                };
+                
+                return fileRequirements[this.jobType] || ['source_face', 'target_image'];
+            }
+
+            changeStep(direction) {
+                const newStep = this.currentStep + direction;
+                
+                if (newStep < 1 || newStep > this.totalSteps) {
+                    return;
+                }
+                
+                // Validate current step before moving
+                if (direction > 0 && !this.validateCurrentStep()) {
+                    return;
+                }
+                
+                this.currentStep = newStep;
+                this.showStep(newStep);
+                this.updateWizardUI();
+            }
+
+            validateCurrentStep() {
+                switch (this.currentStep) {
+                    case 1:
+                        const requiredFiles = this.getRequiredFiles();
+                        return requiredFiles.every(fileType => this.uploadedFiles.has(fileType));
+                    case 2:
+                        const consentTag = document.querySelector('select[name="consent_tag"]').value;
+                        return !!consentTag;
+                    default:
+                        return true;
+                }
+            }
+
+            showStep(step) {
+                // Hide all steps
+                document.querySelectorAll('.step-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show current step
+                document.getElementById(`step${step}`).classList.add('active');
+                
+                // Update step indicators
+                document.querySelectorAll('.step').forEach((stepEl, index) => {
+                    const stepNumber = index + 1;
+                    stepEl.classList.remove('active', 'completed');
+                    
+                    if (stepNumber === step) {
+                        stepEl.classList.add('active');
+                    } else if (stepNumber < step) {
+                        stepEl.classList.add('completed');
+                    }
+                });
+                
+                // Special handling for each step
+                if (step === 3) {
+                    this.generatePreview();
+                } else if (step === 4) {
+                    this.generateFinalSummary();
+                }
+            }
+
+            updateWizardUI() {
+                const prevBtn = document.getElementById('prevBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                
+                // Previous button
+                prevBtn.disabled = this.currentStep === 1;
+                
+                // Next button
+                if (this.currentStep === this.totalSteps) {
+                    nextBtn.innerHTML = '<i class="fas fa-rocket"></i> İşlemi Başlat';
+                    nextBtn.onclick = () => this.launchJob();
+                } else {
+                    nextBtn.innerHTML = 'İleri <i class="fas fa-arrow-right"></i>';
+                    nextBtn.onclick = () => this.changeStep(1);
+                }
+                
+                this.updateStepValidation();
+            }
+
+            generatePreview() {
+                const previewContent = document.getElementById('previewContent');
+                
+                const config = this.collectConfig();
+                const files = Object.fromEntries(this.uploadedFiles);
+                
+                previewContent.innerHTML = `
+                    <div style="display: grid; gap: 1rem;">
+                        <div>
+                            <strong>İşlem Türü:</strong> ${this.getJobTypeTitle()}
+                        </div>
+                        <div>
+                            <strong>Yöntem:</strong> ${config.method || 'InsightFace'}
+                        </div>
+                        <div>
+                            <strong>Renk Düzeltme:</strong> ${config.color_correction ? 'Açık' : 'Kapalı'}
+                        </div>
+                        <div>
+                            <strong>Kalite İyileştirme:</strong> ${config.enhance_quality ? 'Açık' : 'Kapalı'}
+                        </div>
+                        <div>
+                            <strong>Rıza Durumu:</strong> ${this.getConsentLabel(config.consent_tag)}
+                        </div>
+                        <div>
+                            <strong>Yüklenen Dosyalar:</strong> ${Object.keys(files).length} dosya
+                        </div>
+                    </div>
+                `;
+            }
+
+            generateFinalSummary() {
+                const finalSummary = document.getElementById('finalSummary');
+                
+                const config = this.collectConfig();
+                const files = Object.fromEntries(this.uploadedFiles);
+                
+                finalSummary.innerHTML = `
+                    <div style="display: grid; gap: 1rem;">
+                        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px; border-left: 4px solid #28a745;">
+                            <strong>✅ Hazır!</strong> Tüm ayarlar tamamlandı ve işlem başlatılmaya hazır.
+                        </div>
+                        <div>
+                            <strong>İşlem:</strong> ${this.getJobTypeTitle()}
+                        </div>
+                        <div>
+                            <strong>Dosyalar:</strong> ${Object.keys(files).length} dosya yüklendi
+                        </div>
+                        <div>
+                            <strong>Rıza:</strong> ${this.getConsentLabel(config.consent_tag)}
+                        </div>
+                        <div style="color: #6c757d; font-size: 0.9rem;">
+                            İşlem başlatıldıktan sonra iş takip sayfasına yönlendirileceksiniz.
+                        </div>
+                    </div>
+                `;
+            }
+
+            collectConfig() {
+                const form = document.querySelector('.config-form');
+                const config = {};
+                
+                // Collect form data
+                const inputs = form.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    if (input.type === 'checkbox') {
+                        config[input.name] = input.checked;
+                    } else {
+                        config[input.name] = input.value;
+                    }
+                });
+                
+                return config;
+            }
+
+            getJobTypeTitle() {
+                const titles = {
+                    'face_swap': 'Yüz Değiştirme',
+                    'talking_head': 'Konuşan Kafa',
+                    'color_grade': 'Renk Düzeltme',
+                    'bg_replace': 'Arka Plan Değiştirme',
+                    'controlnet_generation': 'AI Görüntü Üretimi',
+                    'video_post_production': 'Video Post-Prodüksiyon'
+                };
+                return titles[this.jobType] || this.jobType;
+            }
+
+            getConsentLabel(consentTag) {
+                const labels = {
+                    'consented': 'İzinli İçerik',
+                    'demo': 'Demo/Eğlence Amaçlı',
+                    'unknown': 'Bilinmeyen'
+                };
+                return labels[consentTag] || consentTag;
+            }
+
+            async launchJob() {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                loadingOverlay.style.display = 'flex';
+                
+                try {
+                    const config = this.collectConfig();
+                    const inputs = Object.fromEntries(this.uploadedFiles);
+                    
+                    const jobData = {
+                        job_type: this.jobType,
+                        inputs: inputs,
+                        params: {
+                            method: config.method,
+                            color_correction: config.color_correction,
+                            enhance_quality: config.enhance_quality
+                        },
+                        consent_tag: config.consent_tag
+                    };
+                    
+                    const response = await fetch('/api/jobs', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(jobData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        // Redirect to job detail page
+                        window.location.href = `/job/${result.id}`;
+                    } else {
+                        throw new Error(result.detail || 'Job creation failed');
+                    }
+                } catch (error) {
+                    loadingOverlay.style.display = 'none';
+                    alert('İş oluşturma hatası: ' + error.message);
+                }
+            }
+        }
+
+        // Global wizard instance
+        let wizard;
+
+        // Global functions
+        function changeStep(direction) {
+            wizard.changeStep(direction);
+        }
+
+        // Initialize wizard
+        document.addEventListener('DOMContentLoaded', () => {
+            wizard = new SmartWizard();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+job_type: face_swap
+params:
+  detector: "insightface"
+  swapper: "inswapper_128.onnx"
+  frame_rate: 25
+  color_correction: true
+  upscale: 1
+  quality: "high"
+  audio:
+    copy_from_target: true
+    loudness_normalize: -16  # LUFS
+  grading:
+    lut: "rec709.cube"
+    saturation: 1.05
+    contrast: 1.02
+consent_tag: demo
+description: "Temel yüz değiştirme - yüksek kalite"
