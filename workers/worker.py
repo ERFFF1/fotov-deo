@@ -1,33 +1,37 @@
 #!/usr/bin/env python3
 """
-RQ Worker
-Redis tabanlı iş kuyruğu worker'ı
+Face/Video AI Studio - Worker Process
+Ağır ML işlemlerini yapan worker süreci
 """
 
 import os
 import sys
-from pathlib import Path
+import redis
+from rq import Worker, Connection
+from rq.worker import WorkerStatus
 
 # Proje kök dizinini Python path'e ekle
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
 
-from rq import Worker, Connection
-import redis
+def start_worker():
+    """Worker sürecini başlat"""
+    try:
+        # Redis bağlantısı
+        redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
+        redis_conn = redis.from_url(redis_url)
+        
+        # Worker oluştur
+        with Connection(redis_conn):
+            worker = Worker(['default'])
+            print("🚀 Face/Video AI Studio Worker başlatılıyor...")
+            print(f"📡 Redis URL: {redis_url}")
+            print("⏳ İş bekleniyor...")
+            worker.work()
+            
+    except Exception as e:
+        print(f"❌ Worker başlatma hatası: {e}")
+        sys.exit(1)
 
-def main():
-    """Worker ana fonksiyonu"""
-    # Redis bağlantısı
-    redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
-    redis_conn = redis.from_url(redis_url)
-    
-    # Worker'ı başlat
-    with Connection(redis_conn):
-        worker = Worker(['default'])
-        print("🚀 RQ Worker başlatılıyor...")
-        print(f"📡 Redis: {redis_url}")
-        print("⏳ İş bekleniyor...")
-        worker.work()
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    start_worker()
